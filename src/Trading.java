@@ -237,6 +237,7 @@ public class Trading {
                             bo.subVolume(txVolume);
                             bo.setUpdateTime(timeNow);
                         }
+                        txTotalPrice = txVolume.multiply(txPrice);
 
                         // 更新订单
                         requestOrder.subVolume(txVolume);
