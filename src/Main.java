@@ -1,66 +1,230 @@
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.*;
+
 import myEnum.*;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static ArrayList<TxRecord> txRecordList = new ArrayList<>();
+    public static Hashtable<String, UserAssets> uaTable = new Hashtable<>();
+    public static TreeSet<SellOrder> soTree = new TreeSet<>(
+            new Comparator<SellOrder>() {
+                @Override
+                public int compare(SellOrder o1, SellOrder o2) {
+                    BigDecimal p1 = o1.getPrice();
+                    BigDecimal p2 = o2.getPrice();
+                    int pcp = p1.compareTo(p2);
+                    if (p1.compareTo(p2) == 0) {
+                        long tct = o1.getCreateTime() - o2.getCreateTime();
+                        if (tct > 0) {
+                            return 1;
+                        } else if (tct == 0) {
+                            return 0;
+                        } else {
+                            return -1;
+                        }
+                    } else {
+                        return pcp;
+                    }
+                }
+            }
+    );
+    public static TreeSet<BuyOrder> boTree = new TreeSet<>(
+            new Comparator<BuyOrder>() {
+                @Override
+                public int compare(BuyOrder o1, BuyOrder o2) {
+                    BigDecimal p1 = o1.getPrice();
+                    BigDecimal p2 = o2.getPrice();
+                    int pcp = p1.compareTo(p2);
+                    if (p1.compareTo(p2) == 0) {
+                        long tct = o1.getCreateTime() - o2.getCreateTime();
+                        if (tct > 0) {
+                            return 1;
+                        } else if (tct == 0) {
+                            return 0;
+                        } else {
+                            return -1;
+                        }
+                    } else {
+                        return -1 * pcp;
+                    }
+                }
+            }
+    );
 
-        // init
-        UserAssets ua1 = new UserAssets("111", new BigDecimal("1000"), new BigDecimal("1000"));
-        UserAssets ua2 = new UserAssets("222", new BigDecimal("1000"), new BigDecimal("1000"));
-
-        SellOrder so1 = new SellOrder(ua1.getUserId(), "106", "10", 6L);
-        SellOrder so2 = new SellOrder(ua1.getUserId(), "105", "10", 5L);
-        SellOrder so3 = new SellOrder(ua1.getUserId(), "104", "10", 4L);
-        SellOrder so4 = new SellOrder(ua1.getUserId(), "103", "10", 3L);
-        SellOrder so5 = new SellOrder(ua1.getUserId(), "102", "10", 2L);
-        SellOrder so6 = new SellOrder(ua1.getUserId(), "101", "10", 1L);
-
-        BuyOrder bo1 = new BuyOrder(ua1.getUserId(), "100", "10", 1L);
-        BuyOrder bo2 = new BuyOrder(ua1.getUserId(), "99", "10", 2L);
-        BuyOrder bo3 = new BuyOrder(ua1.getUserId(), "98", "10", 3L);
-        BuyOrder bo4 = new BuyOrder(ua1.getUserId(), "97", "10", 4L);
-        BuyOrder bo5 = new BuyOrder(ua1.getUserId(), "96", "10", 5L);
-        BuyOrder bo6 = new BuyOrder(ua1.getUserId(), "95", "10", 6L);
-
-        Hashtable<String, UserAssets> uaTable = new Hashtable<>();
+    public static void main(String[] args) throws Exception {
+        UserAssets ua1 = new UserAssets("111", "10000", "1000");
+        UserAssets ua2 = new UserAssets("222", "10000", "1000");
 
         uaTable.put(ua1.getUserId(), ua1);
         uaTable.put(ua2.getUserId(), ua2);
 
-        ArrayList<SellOrder> soList = new ArrayList<>();
-        ArrayList<BuyOrder> boList = new ArrayList<>();
+        SellOrder so6 = new SellOrder(ua1.getUserId(), "16", "10");
+        SellOrder so5 = new SellOrder(ua1.getUserId(), "15", "10");
+        SellOrder so4 = new SellOrder(ua1.getUserId(), "14", "10");
+        SellOrder so3 = new SellOrder(ua1.getUserId(), "13", "10");
+        SellOrder so2 = new SellOrder(ua1.getUserId(), "12", "10");
+        SellOrder so1 = new SellOrder(ua1.getUserId(), "11", "10");
 
-        soList.add(so1);
-        soList.add(so2);
-        soList.add(so3);
-        soList.add(so4);
-        soList.add(so5);
-        soList.add(so6);
+//        BuyOrder bo1 = new BuyOrder(ua1.getUserId(), "10", "10");
+//        BuyOrder bo2 = new BuyOrder(ua1.getUserId(), "9", "10");
+//        BuyOrder bo3 = new BuyOrder(ua1.getUserId(), "8", "10");
+//        BuyOrder bo4 = new BuyOrder(ua1.getUserId(), "7", "10");
+//        BuyOrder bo5 = new BuyOrder(ua1.getUserId(), "6", "10");
+//        BuyOrder bo6 = new BuyOrder(ua1.getUserId(), "5", "10");
 
-        boList.add(bo1);
-        boList.add(bo2);
-        boList.add(bo3);
-        boList.add(bo4);
-        boList.add(bo5);
-        boList.add(bo6);
-
-
-        // request info
-        String userId = "111";
-        BigDecimal price = new BigDecimal("100");
-        BigDecimal volume = new BigDecimal("100");
-        TxDirectionEnum txDirectionEnum = TxDirectionEnum.BUY;
+        BuyOrder bo1 = new BuyOrder(ua1.getUserId(), "16", "10");
+        BuyOrder bo2 = new BuyOrder(ua1.getUserId(), "15", "10");
+        BuyOrder bo3 = new BuyOrder(ua1.getUserId(), "14", "10");
+        BuyOrder bo4 = new BuyOrder(ua1.getUserId(), "13", "10");
+        BuyOrder bo5 = new BuyOrder(ua1.getUserId(), "12", "10");
+        BuyOrder bo6 = new BuyOrder(ua1.getUserId(), "10", "10");
 
 
-        // tx opt
-        // search user
-        UserAssets ua = uaTable.get(userId);
+        makeTrade(so6, TxDirectionEnum.SELL);
+        makeTrade(so5, TxDirectionEnum.SELL);
+        makeTrade(so4, TxDirectionEnum.SELL);
+        makeTrade(so3, TxDirectionEnum.SELL);
+        makeTrade(so2, TxDirectionEnum.SELL);
+        makeTrade(so1, TxDirectionEnum.SELL);
+
+        makeTrade(bo1, TxDirectionEnum.BUY);
+        makeTrade(bo2, TxDirectionEnum.BUY);
+        makeTrade(bo3, TxDirectionEnum.BUY);
+        makeTrade(bo4, TxDirectionEnum.BUY);
+        makeTrade(bo5, TxDirectionEnum.BUY);
+        makeTrade(bo6, TxDirectionEnum.BUY);
 
 
     }
+
+    // 1: 成功   2: 资产不足    3: code error
+    public static int makeTrade(Order requestOrder, TxDirectionEnum txDirectionEnum) throws Exception {
+        // search user
+        UserAssets ua = uaTable.get(requestOrder.getUserId());
+        long timeNow = new Date().getTime();
+
+        switch (txDirectionEnum) {
+            case BUY:
+                // 判断资产是否足够
+                BigDecimal oTotalPrice = requestOrder.getPrice().multiply(requestOrder.getVolume());
+                if (ua.getUsdtAmt().compareTo(oTotalPrice) < 0) {
+                    return 2;
+                }
+
+                // 冻结资产
+                ua.updateUsdtAmt(oTotalPrice, AssetsUpateEnum.SUB);
+                ua.updateUsdtForzenAmt(oTotalPrice, AssetsUpateEnum.ADD);
+
+                // 交易匹配
+                for (SellOrder so : soTree) {
+                    BigDecimal rPrice = requestOrder.getPrice();
+                    BigDecimal rVolume = requestOrder.getVolume();
+                    BigDecimal sPrice = so.getPrice();
+                    BigDecimal sVolume = so.getVolume();
+
+                    if (rPrice.compareTo(sPrice) >= 0) {
+                        UserAssets sellUa = uaTable.get(so.getUserId());
+                        BigDecimal txPrice = sPrice;
+                        BigDecimal txVolume = BigDecimal.ZERO;
+                        BigDecimal txTotalPrice = BigDecimal.ZERO;
+
+                        if (rVolume.compareTo(sVolume) >= 0) {
+                            txVolume = sVolume;
+                            soTree.remove(so);
+                        } else {
+                            txVolume = rVolume;
+                            so.subVolume(txVolume);
+                            so.setUpdateTime(timeNow);
+                        }
+                        txTotalPrice = txPrice.multiply(txVolume);
+
+                        // 更新订单
+                        requestOrder.subVolume(txVolume);
+
+                        // 更新用户资产
+                        ua.updateUsdtForzenAmt(txTotalPrice, AssetsUpateEnum.SUB);
+                        ua.updateBtcAmt(txVolume, AssetsUpateEnum.ADD);
+                        sellUa.updateUsdtAmt(txTotalPrice, AssetsUpateEnum.ADD);
+                        sellUa.updateBtcForzenAmt(txVolume, AssetsUpateEnum.SUB);
+
+                        // 添加交易记录
+                        TxRecord txRecord = new TxRecord(ua.getUserId(), sellUa.getUserId(), txPrice.toString(), txVolume.toString(), timeNow);
+                        txRecordList.add(txRecord);
+
+                        if (rVolume.compareTo(sVolume) <= 0) {
+                            break;
+                        }
+                    }
+                }
+                if (requestOrder.getVolume().compareTo(BigDecimal.ZERO) > 0) {
+                    boTree.add((BuyOrder) requestOrder);
+                }
+                break;
+
+            case SELL:
+                // 判断资产是否足够
+                BigDecimal oVolume = requestOrder.getVolume();
+                if (ua.getBtcAmt().compareTo(oVolume) < 0) {
+                    return 2;
+                }
+
+                // 冻结资产
+                ua.updateBtcAmt(oVolume, AssetsUpateEnum.SUB);
+                ua.updateBtcForzenAmt(oVolume, AssetsUpateEnum.ADD);
+
+                // 交易匹配
+                for (BuyOrder bo : boTree) {
+                    BigDecimal rPrice = requestOrder.getPrice();
+                    BigDecimal rVolume = requestOrder.getVolume();
+                    BigDecimal bPrice = bo.getPrice();
+                    BigDecimal bVolume = bo.getVolume();
+
+                    if (rPrice.compareTo(bPrice) <= 0) {
+                        UserAssets buyUa = uaTable.get(bo.getUserId());
+                        BigDecimal txPrice = bPrice;
+                        BigDecimal txVolume = BigDecimal.ZERO;
+                        BigDecimal txTotalPrice = BigDecimal.ZERO;
+
+                        if (rVolume.compareTo(bVolume) >= 0) {
+                            txVolume = bVolume;
+                            boTree.remove(bo);
+                        } else {
+                            txVolume = rVolume;
+                            bo.subVolume(txVolume);
+                            bo.setUpdateTime(timeNow);
+                        }
+
+                        // 更新订单
+                        requestOrder.subVolume(txVolume);
+
+                        // 更新用户资产
+                        ua.updateBtcForzenAmt(txVolume, AssetsUpateEnum.SUB);
+                        ua.updateUsdtAmt(txTotalPrice, AssetsUpateEnum.ADD);
+                        buyUa.updateBtcAmt(txVolume, AssetsUpateEnum.ADD);
+                        buyUa.updateUsdtForzenAmt(txTotalPrice, AssetsUpateEnum.SUB);
+
+                        // 添加交易记录
+                        TxRecord txRecord = new TxRecord(buyUa.getUserId(), ua.getUserId(), txPrice.toString(), txVolume.toString(), timeNow);
+
+                        if(rVolume.compareTo(bVolume) <= 0){
+                            break;
+                        }
+                    }
+                }
+
+                if (requestOrder.getVolume().compareTo(BigDecimal.ZERO) > 0) {
+                    soTree.add((SellOrder) requestOrder);
+                }
+                break;
+            default:
+                return 3;
+        }
+
+        return 1;
+    }
+
+
 
 
 }
