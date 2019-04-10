@@ -95,4 +95,14 @@ public class UserAssets {
         }
     }
 
+    @Override
+    public String toString() {
+        return "UserAssets{" +
+                "userId='" + userId + '\'' +
+                ", usdtAmt=" + usdtAmt +
+                ", btcAmt=" + btcAmt +
+                ", usdtForzenAmt=" + usdtForzenAmt +
+                ", btcForzenAmt=" + btcForzenAmt +
+                '}';
+    }
 }

@@ -3,7 +3,7 @@ import java.util.*;
 
 import myEnum.*;
 
-public class Main {
+public class Trading {
 
     public static ArrayList<TxRecord> txRecordList = new ArrayList<>();
     public static Hashtable<String, UserAssets> uaTable = new Hashtable<>();
@@ -66,19 +66,19 @@ public class Main {
         SellOrder so2 = new SellOrder(ua1.getUserId(), "12", "10");
         SellOrder so1 = new SellOrder(ua1.getUserId(), "11", "10");
 
-//        BuyOrder bo1 = new BuyOrder(ua1.getUserId(), "10", "10");
-//        BuyOrder bo2 = new BuyOrder(ua1.getUserId(), "9", "10");
-//        BuyOrder bo3 = new BuyOrder(ua1.getUserId(), "8", "10");
-//        BuyOrder bo4 = new BuyOrder(ua1.getUserId(), "7", "10");
-//        BuyOrder bo5 = new BuyOrder(ua1.getUserId(), "6", "10");
-//        BuyOrder bo6 = new BuyOrder(ua1.getUserId(), "5", "10");
+        BuyOrder bo1 = new BuyOrder(ua1.getUserId(), "10", "10");
+        BuyOrder bo2 = new BuyOrder(ua1.getUserId(), "9", "10");
+        BuyOrder bo3 = new BuyOrder(ua1.getUserId(), "8", "10");
+        BuyOrder bo4 = new BuyOrder(ua1.getUserId(), "7", "10");
+        BuyOrder bo5 = new BuyOrder(ua1.getUserId(), "6", "10");
+        BuyOrder bo6 = new BuyOrder(ua1.getUserId(), "5", "10");
 
-        BuyOrder bo1 = new BuyOrder(ua1.getUserId(), "16", "10");
-        BuyOrder bo2 = new BuyOrder(ua1.getUserId(), "15", "10");
-        BuyOrder bo3 = new BuyOrder(ua1.getUserId(), "14", "10");
-        BuyOrder bo4 = new BuyOrder(ua1.getUserId(), "13", "10");
-        BuyOrder bo5 = new BuyOrder(ua1.getUserId(), "12", "10");
-        BuyOrder bo6 = new BuyOrder(ua1.getUserId(), "10", "10");
+//        BuyOrder bo1 = new BuyOrder(ua1.getUserId(), "11", "10");
+//        BuyOrder bo2 = new BuyOrder(ua1.getUserId(), "12", "10");
+//        BuyOrder bo3 = new BuyOrder(ua1.getUserId(), "13", "10");
+//        BuyOrder bo4 = new BuyOrder(ua1.getUserId(), "14", "10");
+//        BuyOrder bo5 = new BuyOrder(ua1.getUserId(), "15", "10");
+//        BuyOrder bo6 = new BuyOrder(ua1.getUserId(), "16", "10");
 
 
         makeTrade(so6, TxDirectionEnum.SELL);
@@ -96,10 +96,48 @@ public class Main {
         makeTrade(bo6, TxDirectionEnum.BUY);
 
 
+        for (int i = 0; i < 1000; i++) {
+            msgPrint(ua1.toString());
+            msgPrint(ua2.toString());
+            msgPrint("");
+            for (SellOrder so : soTree) {
+                msgPrint(so.getPrice() + "\t\t" + so.getVolume() + "\t\t" + so.getUserId());
+            }
+            msgPrint("||||||||||||||||||||");
+            for (BuyOrder bo : boTree) {
+                msgPrint(bo.getPrice() + "\t\t" + bo.getVolume() + "\t\t" + bo.getUserId());
+            }
+
+            Scanner sc = new Scanner(System.in);
+            msgPrint("please enter opt type( b|s )");
+            String txDirectionStr = sc.next();
+            msgPrint("please enter a price:");
+            String priceStr = sc.next();
+            msgPrint("please enter a volume:");
+            String volumeStr = sc.next();
+
+            if("b".equals(txDirectionStr)){
+                BuyOrder requestOrder = new BuyOrder(ua2.getUserId(), priceStr, volumeStr);
+                makeTrade(requestOrder, TxDirectionEnum.BUY);
+            }else{
+                SellOrder requestOrder = new SellOrder(ua2.getUserId(), priceStr, volumeStr);
+                makeTrade(requestOrder, TxDirectionEnum.SELL);
+            }
+
+
+        }
+
+    }
+
+    public static void msgPrint(String msg){
+        System.out.println(msg);
     }
 
     // 1: 成功   2: 资产不足    3: code error
     public static int makeTrade(Order requestOrder, TxDirectionEnum txDirectionEnum) throws Exception {
+        if(requestOrder.getVolume().compareTo(BigDecimal.ZERO) <= 0 || requestOrder.getPrice().compareTo(BigDecimal.ZERO) <= 0){
+            return 3;
+        }
         // search user
         UserAssets ua = uaTable.get(requestOrder.getUserId());
         long timeNow = new Date().getTime();
@@ -117,7 +155,9 @@ public class Main {
                 ua.updateUsdtForzenAmt(oTotalPrice, AssetsUpateEnum.ADD);
 
                 // 交易匹配
-                for (SellOrder so : soTree) {
+                Iterator<SellOrder> soIterator = soTree.iterator();
+                while (soIterator.hasNext()) {
+                    SellOrder so = soIterator.next();
                     BigDecimal rPrice = requestOrder.getPrice();
                     BigDecimal rVolume = requestOrder.getVolume();
                     BigDecimal sPrice = so.getPrice();
@@ -131,7 +171,7 @@ public class Main {
 
                         if (rVolume.compareTo(sVolume) >= 0) {
                             txVolume = sVolume;
-                            soTree.remove(so);
+                            soIterator.remove();
                         } else {
                             txVolume = rVolume;
                             so.subVolume(txVolume);
@@ -143,7 +183,8 @@ public class Main {
                         requestOrder.subVolume(txVolume);
 
                         // 更新用户资产
-                        ua.updateUsdtForzenAmt(txTotalPrice, AssetsUpateEnum.SUB);
+                        ua.updateUsdtForzenAmt(txVolume.multiply(rPrice), AssetsUpateEnum.SUB);
+                        ua.updateUsdtAmt(txVolume.multiply(rPrice.subtract(sPrice)), AssetsUpateEnum.ADD);
                         ua.updateBtcAmt(txVolume, AssetsUpateEnum.ADD);
                         sellUa.updateUsdtAmt(txTotalPrice, AssetsUpateEnum.ADD);
                         sellUa.updateBtcForzenAmt(txVolume, AssetsUpateEnum.SUB);
@@ -174,7 +215,9 @@ public class Main {
                 ua.updateBtcForzenAmt(oVolume, AssetsUpateEnum.ADD);
 
                 // 交易匹配
-                for (BuyOrder bo : boTree) {
+                Iterator<BuyOrder> boIterable = boTree.iterator();
+                while (boIterable.hasNext()) {
+                    BuyOrder bo = boIterable.next();
                     BigDecimal rPrice = requestOrder.getPrice();
                     BigDecimal rVolume = requestOrder.getVolume();
                     BigDecimal bPrice = bo.getPrice();
@@ -188,7 +231,7 @@ public class Main {
 
                         if (rVolume.compareTo(bVolume) >= 0) {
                             txVolume = bVolume;
-                            boTree.remove(bo);
+                            boIterable.remove();
                         } else {
                             txVolume = rVolume;
                             bo.subVolume(txVolume);
