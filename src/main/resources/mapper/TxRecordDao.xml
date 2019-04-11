@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="newbbb.dao.TxRecordDao">
+  <resultMap id="BaseResultMap" type="newbbb.model.TxRecord">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="uid" jdbcType="CHAR" property="uid" />
+    <result column="buyer_uid" jdbcType="CHAR" property="buyerUid" />
+    <result column="seller_uid" jdbcType="CHAR" property="sellerUid" />
+    <result column="deal_price" jdbcType="DECIMAL" property="dealPrice" />
+    <result column="volume" jdbcType="DECIMAL" property="volume" />
+    <result column="tx_fee" jdbcType="DECIMAL" property="txFee" />
+    <result column="create_time" jdbcType="BIGINT" property="createTime" />
+    <result column="update_time" jdbcType="BIGINT" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, uid, buyer_uid, seller_uid, deal_price, volume, tx_fee, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from fb_tx_record
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from fb_tx_record
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="newbbb.model.TxRecord">
+    insert into fb_tx_record (id, uid, buyer_uid, 
+      seller_uid, deal_price, volume, 
+      tx_fee, create_time, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{uid,jdbcType=CHAR}, #{buyerUid,jdbcType=CHAR}, 
+      #{sellerUid,jdbcType=CHAR}, #{dealPrice,jdbcType=DECIMAL}, #{volume,jdbcType=DECIMAL}, 
+      #{txFee,jdbcType=DECIMAL}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="newbbb.model.TxRecord">
+    insert into fb_tx_record
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="uid != null">
+        uid,
+      </if>
+      <if test="buyerUid != null">
+        buyer_uid,
+      </if>
+      <if test="sellerUid != null">
+        seller_uid,
+      </if>
+      <if test="dealPrice != null">
+        deal_price,
+      </if>
+      <if test="volume != null">
+        volume,
+      </if>
+      <if test="txFee != null">
+        tx_fee,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="uid != null">
+        #{uid,jdbcType=CHAR},
+      </if>
+      <if test="buyerUid != null">
+        #{buyerUid,jdbcType=CHAR},
+      </if>
+      <if test="sellerUid != null">
+        #{sellerUid,jdbcType=CHAR},
+      </if>
+      <if test="dealPrice != null">
+        #{dealPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="volume != null">
+        #{volume,jdbcType=DECIMAL},
+      </if>
+      <if test="txFee != null">
+        #{txFee,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="newbbb.model.TxRecord">
+    update fb_tx_record
+    <set>
+      <if test="uid != null">
+        uid = #{uid,jdbcType=CHAR},
+      </if>
+      <if test="buyerUid != null">
+        buyer_uid = #{buyerUid,jdbcType=CHAR},
+      </if>
+      <if test="sellerUid != null">
+        seller_uid = #{sellerUid,jdbcType=CHAR},
+      </if>
+      <if test="dealPrice != null">
+        deal_price = #{dealPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="volume != null">
+        volume = #{volume,jdbcType=DECIMAL},
+      </if>
+      <if test="txFee != null">
+        tx_fee = #{txFee,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=BIGINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="newbbb.model.TxRecord">
+    update fb_tx_record
+    set uid = #{uid,jdbcType=CHAR},
+      buyer_uid = #{buyerUid,jdbcType=CHAR},
+      seller_uid = #{sellerUid,jdbcType=CHAR},
+      deal_price = #{dealPrice,jdbcType=DECIMAL},
+      volume = #{volume,jdbcType=DECIMAL},
+      tx_fee = #{txFee,jdbcType=DECIMAL},
+      create_time = #{createTime,jdbcType=BIGINT},
+      update_time = #{updateTime,jdbcType=BIGINT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

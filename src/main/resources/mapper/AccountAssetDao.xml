@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="newbbb.dao.AccountAssetDao">
+  <resultMap id="BaseResultMap" type="newbbb.model.AccountAsset">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="account_uid" jdbcType="INTEGER" property="accountUid" />
+    <result column="coin_id" jdbcType="INTEGER" property="coinId" />
+    <result column="amt" jdbcType="DECIMAL" property="amt" />
+    <result column="forzen_amt" jdbcType="DECIMAL" property="forzenAmt" />
+    <result column="create_time" jdbcType="BIGINT" property="createTime" />
+    <result column="update_time" jdbcType="BIGINT" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, account_uid, coin_id, amt, forzen_amt, create_time, update_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from fb_account_asset
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from fb_account_asset
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="newbbb.model.AccountAsset">
+    insert into fb_account_asset (id, account_uid, coin_id, 
+      amt, forzen_amt, create_time, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{accountUid,jdbcType=INTEGER}, #{coinId,jdbcType=INTEGER}, 
+      #{amt,jdbcType=DECIMAL}, #{forzenAmt,jdbcType=DECIMAL}, #{createTime,jdbcType=BIGINT}, 
+      #{updateTime,jdbcType=BIGINT})
+  </insert>
+  <insert id="insertSelective" parameterType="newbbb.model.AccountAsset">
+    insert into fb_account_asset
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="accountUid != null">
+        account_uid,
+      </if>
+      <if test="coinId != null">
+        coin_id,
+      </if>
+      <if test="amt != null">
+        amt,
+      </if>
+      <if test="forzenAmt != null">
+        forzen_amt,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="accountUid != null">
+        #{accountUid,jdbcType=INTEGER},
+      </if>
+      <if test="coinId != null">
+        #{coinId,jdbcType=INTEGER},
+      </if>
+      <if test="amt != null">
+        #{amt,jdbcType=DECIMAL},
+      </if>
+      <if test="forzenAmt != null">
+        #{forzenAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="newbbb.model.AccountAsset">
+    update fb_account_asset
+    <set>
+      <if test="accountUid != null">
+        account_uid = #{accountUid,jdbcType=INTEGER},
+      </if>
+      <if test="coinId != null">
+        coin_id = #{coinId,jdbcType=INTEGER},
+      </if>
+      <if test="amt != null">
+        amt = #{amt,jdbcType=DECIMAL},
+      </if>
+      <if test="forzenAmt != null">
+        forzen_amt = #{forzenAmt,jdbcType=DECIMAL},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=BIGINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="newbbb.model.AccountAsset">
+    update fb_account_asset
+    set account_uid = #{accountUid,jdbcType=INTEGER},
+      coin_id = #{coinId,jdbcType=INTEGER},
+      amt = #{amt,jdbcType=DECIMAL},
+      forzen_amt = #{forzenAmt,jdbcType=DECIMAL},
+      create_time = #{createTime,jdbcType=BIGINT},
+      update_time = #{updateTime,jdbcType=BIGINT}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
