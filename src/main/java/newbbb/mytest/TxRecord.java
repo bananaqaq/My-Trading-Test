@@ -1,3 +1,5 @@
+package newbbb.mytest;
+
 import java.math.BigDecimal;
 
 public class TxRecord {

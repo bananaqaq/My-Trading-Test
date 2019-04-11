@@ -1,5 +1,6 @@
-import myEnum.OrderStatusEnum;
+package newbbb.mytest;
 
+import newbbb.enums.OrderStatusEnum;
 import java.math.BigDecimal;
 import java.util.Date;
 

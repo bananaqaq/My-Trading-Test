@@ -1,4 +1,7 @@
+package newbbb.mytest;
+
 import myEnum.TxDirectionEnum;
+import newbbb.mytest.BuyOrder;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -10,7 +13,7 @@ public class MyTest {
     public static void main(String[] args) throws Exception {
 
         int userNum = 10000;
-        int tradingNum = 10;
+        int tradingNum = 16;
         Random random = new Random();
         ArrayList<TradeInfo> oList = new ArrayList<>();
 

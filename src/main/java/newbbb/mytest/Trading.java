@@ -1,7 +1,10 @@
+package newbbb.mytest;
+
 import java.math.BigDecimal;
 import java.util.*;
 
-import myEnum.*;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Trading {
 
@@ -53,6 +56,8 @@ public class Trading {
     );
 
     public static void main(String[] args) throws Exception {
+        ApplicationContext context = new ClassPathXmlApplicationContext("class:spring/application-context.xml");
+
         UserAssets ua1 = new UserAssets("111", "10000", "1000");
         UserAssets ua2 = new UserAssets("222", "10000", "1000");
 
@@ -81,25 +86,29 @@ public class Trading {
 //        BuyOrder bo6 = new BuyOrder(ua1.getUserId(), "16", "10");
 
 
-        makeTrade(so6, TxDirectionEnum.SELL);
-        makeTrade(so5, TxDirectionEnum.SELL);
-        makeTrade(so4, TxDirectionEnum.SELL);
-        makeTrade(so3, TxDirectionEnum.SELL);
-        makeTrade(so2, TxDirectionEnum.SELL);
-        makeTrade(so1, TxDirectionEnum.SELL);
+        makeTrade(so6, myEnum.TxDirectionEnum.SELL);
+        makeTrade(so5, myEnum.TxDirectionEnum.SELL);
+        makeTrade(so4, myEnum.TxDirectionEnum.SELL);
+        makeTrade(so3, myEnum.TxDirectionEnum.SELL);
+        makeTrade(so2, myEnum.TxDirectionEnum.SELL);
+        makeTrade(so1, myEnum.TxDirectionEnum.SELL);
 
-        makeTrade(bo1, TxDirectionEnum.BUY);
-        makeTrade(bo2, TxDirectionEnum.BUY);
-        makeTrade(bo3, TxDirectionEnum.BUY);
-        makeTrade(bo4, TxDirectionEnum.BUY);
-        makeTrade(bo5, TxDirectionEnum.BUY);
-        makeTrade(bo6, TxDirectionEnum.BUY);
+        makeTrade(bo1, myEnum.TxDirectionEnum.BUY);
+        makeTrade(bo2, myEnum.TxDirectionEnum.BUY);
+        makeTrade(bo3, myEnum.TxDirectionEnum.BUY);
+        makeTrade(bo4, myEnum.TxDirectionEnum.BUY);
+        makeTrade(bo5, myEnum.TxDirectionEnum.BUY);
+        makeTrade(bo6, myEnum.TxDirectionEnum.BUY);
 
 
         for (int i = 0; i < 1000; i++) {
             msgPrint(ua1.toString());
             msgPrint(ua2.toString());
             msgPrint("");
+            for(TxRecord txRecord:txRecordList){
+                msgPrint(txRecord.getBuyerId()+"\t\t"+txRecord.getSellerId() + "\t\t" + txRecord.getDealPrice() + "\t\t" + txRecord.getVolume());
+            }
+            msgPrint("--------------------");
             for (SellOrder so : soTree) {
                 msgPrint(so.getPrice() + "\t\t" + so.getVolume() + "\t\t" + so.getUserId());
             }
@@ -118,10 +127,10 @@ public class Trading {
 
             if("b".equals(txDirectionStr)){
                 BuyOrder requestOrder = new BuyOrder(ua2.getUserId(), priceStr, volumeStr);
-                makeTrade(requestOrder, TxDirectionEnum.BUY);
+                makeTrade(requestOrder, myEnum.TxDirectionEnum.BUY);
             }else{
                 SellOrder requestOrder = new SellOrder(ua2.getUserId(), priceStr, volumeStr);
-                makeTrade(requestOrder, TxDirectionEnum.SELL);
+                makeTrade(requestOrder, myEnum.TxDirectionEnum.SELL);
             }
 
 
@@ -134,7 +143,7 @@ public class Trading {
     }
 
     // 1: 成功   2: 资产不足    3: code error
-    public static int makeTrade(Order requestOrder, TxDirectionEnum txDirectionEnum) throws Exception {
+    public static int makeTrade(Order requestOrder, myEnum.TxDirectionEnum txDirectionEnum) throws Exception {
         if(requestOrder.getVolume().compareTo(BigDecimal.ZERO) <= 0 || requestOrder.getPrice().compareTo(BigDecimal.ZERO) <= 0){
             return 3;
         }
@@ -151,8 +160,8 @@ public class Trading {
                 }
 
                 // 冻结资产
-                ua.updateUsdtAmt(oTotalPrice, AssetsUpateEnum.SUB);
-                ua.updateUsdtForzenAmt(oTotalPrice, AssetsUpateEnum.ADD);
+                ua.updateUsdtAmt(oTotalPrice, myEnum.AssetsUpateEnum.SUB);
+                ua.updateUsdtForzenAmt(oTotalPrice, myEnum.AssetsUpateEnum.ADD);
 
                 // 交易匹配
                 Iterator<SellOrder> soIterator = soTree.iterator();
@@ -183,11 +192,11 @@ public class Trading {
                         requestOrder.subVolume(txVolume);
 
                         // 更新用户资产
-                        ua.updateUsdtForzenAmt(txVolume.multiply(rPrice), AssetsUpateEnum.SUB);
-                        ua.updateUsdtAmt(txVolume.multiply(rPrice.subtract(sPrice)), AssetsUpateEnum.ADD);
-                        ua.updateBtcAmt(txVolume, AssetsUpateEnum.ADD);
-                        sellUa.updateUsdtAmt(txTotalPrice, AssetsUpateEnum.ADD);
-                        sellUa.updateBtcForzenAmt(txVolume, AssetsUpateEnum.SUB);
+                        ua.updateUsdtForzenAmt(txVolume.multiply(rPrice), myEnum.AssetsUpateEnum.SUB);
+                        ua.updateUsdtAmt(txVolume.multiply(rPrice.subtract(sPrice)), myEnum.AssetsUpateEnum.ADD);
+                        ua.updateBtcAmt(txVolume, myEnum.AssetsUpateEnum.ADD);
+                        sellUa.updateUsdtAmt(txTotalPrice, myEnum.AssetsUpateEnum.ADD);
+                        sellUa.updateBtcForzenAmt(txVolume, myEnum.AssetsUpateEnum.SUB);
 
                         // 添加交易记录
                         TxRecord txRecord = new TxRecord(ua.getUserId(), sellUa.getUserId(), txPrice.toString(), txVolume.toString(), timeNow);
@@ -211,8 +220,8 @@ public class Trading {
                 }
 
                 // 冻结资产
-                ua.updateBtcAmt(oVolume, AssetsUpateEnum.SUB);
-                ua.updateBtcForzenAmt(oVolume, AssetsUpateEnum.ADD);
+                ua.updateBtcAmt(oVolume, myEnum.AssetsUpateEnum.SUB);
+                ua.updateBtcForzenAmt(oVolume, myEnum.AssetsUpateEnum.ADD);
 
                 // 交易匹配
                 Iterator<BuyOrder> boIterable = boTree.iterator();
@@ -243,13 +252,14 @@ public class Trading {
                         requestOrder.subVolume(txVolume);
 
                         // 更新用户资产
-                        ua.updateBtcForzenAmt(txVolume, AssetsUpateEnum.SUB);
-                        ua.updateUsdtAmt(txTotalPrice, AssetsUpateEnum.ADD);
-                        buyUa.updateBtcAmt(txVolume, AssetsUpateEnum.ADD);
-                        buyUa.updateUsdtForzenAmt(txTotalPrice, AssetsUpateEnum.SUB);
+                        ua.updateBtcForzenAmt(txVolume, myEnum.AssetsUpateEnum.SUB);
+                        ua.updateUsdtAmt(txTotalPrice, myEnum.AssetsUpateEnum.ADD);
+                        buyUa.updateBtcAmt(txVolume, myEnum.AssetsUpateEnum.ADD);
+                        buyUa.updateUsdtForzenAmt(txTotalPrice, myEnum.AssetsUpateEnum.SUB);
 
                         // 添加交易记录
                         TxRecord txRecord = new TxRecord(buyUa.getUserId(), ua.getUserId(), txPrice.toString(), txVolume.toString(), timeNow);
+                        txRecordList.add(txRecord);
 
                         if(rVolume.compareTo(bVolume) <= 0){
                             break;

@@ -1,4 +1,4 @@
-package myEnum;
+package newbbb.enums;
 
 public enum OrderStatusEnum {
     NO_DEAL,        // 未成交

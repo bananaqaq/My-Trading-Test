@@ -1,5 +1,6 @@
-import myEnum.AssetsUpateEnum;
+package newbbb.mytest;
 
+import myEnum.AssetsUpateEnum;
 import java.math.BigDecimal;
 
 public class UserAssets {
