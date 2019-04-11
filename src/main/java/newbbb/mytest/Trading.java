@@ -56,7 +56,7 @@ public class Trading {
     );
 
     public static void main(String[] args) throws Exception {
-        ApplicationContext context = new ClassPathXmlApplicationContext("class:spring/application-context.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext("spring/application-context.xml");
 
         UserAssets ua1 = new UserAssets("111", "10000", "1000");
         UserAssets ua2 = new UserAssets("222", "10000", "1000");
