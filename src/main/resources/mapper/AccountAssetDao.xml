@@ -3,7 +3,7 @@
 <mapper namespace="newbbb.dao.AccountAssetDao">
   <resultMap id="BaseResultMap" type="newbbb.model.AccountAsset">
     <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="account_uid" jdbcType="INTEGER" property="accountUid" />
+    <result column="account_uid" jdbcType="CHAR" property="accountUid" />
     <result column="coin_id" jdbcType="INTEGER" property="coinId" />
     <result column="amt" jdbcType="DECIMAL" property="amt" />
     <result column="forzen_amt" jdbcType="DECIMAL" property="forzenAmt" />
@@ -27,7 +27,7 @@
     insert into fb_account_asset (id, account_uid, coin_id, 
       amt, forzen_amt, create_time, 
       update_time)
-    values (#{id,jdbcType=INTEGER}, #{accountUid,jdbcType=INTEGER}, #{coinId,jdbcType=INTEGER}, 
+    values (#{id,jdbcType=INTEGER}, #{accountUid,jdbcType=CHAR}, #{coinId,jdbcType=INTEGER}, 
       #{amt,jdbcType=DECIMAL}, #{forzenAmt,jdbcType=DECIMAL}, #{createTime,jdbcType=BIGINT}, 
       #{updateTime,jdbcType=BIGINT})
   </insert>
@@ -61,7 +61,7 @@
         #{id,jdbcType=INTEGER},
       </if>
       <if test="accountUid != null">
-        #{accountUid,jdbcType=INTEGER},
+        #{accountUid,jdbcType=CHAR},
       </if>
       <if test="coinId != null">
         #{coinId,jdbcType=INTEGER},
@@ -84,7 +84,7 @@
     update fb_account_asset
     <set>
       <if test="accountUid != null">
-        account_uid = #{accountUid,jdbcType=INTEGER},
+        account_uid = #{accountUid,jdbcType=CHAR},
       </if>
       <if test="coinId != null">
         coin_id = #{coinId,jdbcType=INTEGER},
@@ -106,7 +106,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="newbbb.model.AccountAsset">
     update fb_account_asset
-    set account_uid = #{accountUid,jdbcType=INTEGER},
+    set account_uid = #{accountUid,jdbcType=CHAR},
       coin_id = #{coinId,jdbcType=INTEGER},
       amt = #{amt,jdbcType=DECIMAL},
       forzen_amt = #{forzenAmt,jdbcType=DECIMAL},
@@ -114,4 +114,43 @@
       update_time = #{updateTime,jdbcType=BIGINT}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+
+
+
+  <select id="selectByAUidAndCId" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from fb_account_asset
+    where account_uid = #{accountUid, jdbcType=CHAR} and coin_id = #{coinId, jdbcType=INTEGER}
+  </select>
+
+  <!--更新资产-->
+  <update id="addAmt" parameterType="map">
+    update fb_account_asset
+    set amt = amt + #{amt,jdbcType=DECIMAL}
+    where account_uid = #{accountUid,jdbcType=CHAR} and coin_id = #{coinId, jdbcType=INTEGER}
+  </update>
+
+  <update id="subAmt" parameterType="map">
+    update fb_account_asset
+    set amt = amt - #{amt,jdbcType=DECIMAL}
+    where account_uid = #{accountUid,jdbcType=CHAR} and coin_id = #{coinId, jdbcType=INTEGER}
+  </update>
+
+  <!--更新冻结资产-->
+  <update id="addForzenAmt" parameterType="map">
+    update fb_account_asset
+    set forzen_amt = forzen_amt + #{amt,jdbcType=DECIMAL}
+    where account_uid = #{accountUid,jdbcType=CHAR} and coin_id = #{coinId, jdbcType=INTEGER}
+  </update>
+
+  <update id="subForzenAmt" parameterType="map">
+    update fb_account_asset
+    set forzen_amt = forzen_amt - #{amt,jdbcType=DECIMAL}
+    where account_uid = #{accountUid,jdbcType=CHAR} and coin_id = #{coinId, jdbcType=INTEGER}
+  </update>
+
+
 </mapper>

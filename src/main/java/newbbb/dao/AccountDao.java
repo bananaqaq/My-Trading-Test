@@ -14,4 +14,12 @@ public interface AccountDao {
     int updateByPrimaryKeySelective(Account record);
 
     int updateByPrimaryKey(Account record);
+
+
+
+
+
+    Account selectByUid(String uid);
+
+    int updateByUidSelective(Account account);
 }

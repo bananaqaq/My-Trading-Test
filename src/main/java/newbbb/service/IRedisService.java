@@ -25,5 +25,5 @@ public interface IRedisService {
 
 	List<String> getList(String key);
 
-	public Long remListValue(String key, long count, String value);
+	Long remListValue(String key, long count, String value);
 }

@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 public class AccountAsset {
     private Integer id;
 
-    private Integer accountUid;
+    private String accountUid;
 
     private Integer coinId;
 
@@ -25,12 +25,12 @@ public class AccountAsset {
         this.id = id;
     }
 
-    public Integer getAccountUid() {
+    public String getAccountUid() {
         return accountUid;
     }
 
-    public void setAccountUid(Integer accountUid) {
-        this.accountUid = accountUid;
+    public void setAccountUid(String accountUid) {
+        this.accountUid = accountUid == null ? null : accountUid.trim();
     }
 
     public Integer getCoinId() {
