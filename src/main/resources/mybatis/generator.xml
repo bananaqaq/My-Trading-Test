@@ -47,12 +47,12 @@
                <!--enableSelectByExample="false"-->
                <!--selectByExampleQueryId="false"/>-->
 
-        <table tableName="fb_buy_order" domainObjectName="BuyOrder" mapperName="BuyOrderDao"
-               enableCountByExample="false"
-               enableUpdateByExample="false"
-               enableDeleteByExample="false"
-               enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
+        <!--<table tableName="fb_buy_order" domainObjectName="BuyOrder" mapperName="BuyOrderDao"-->
+               <!--enableCountByExample="false"-->
+               <!--enableUpdateByExample="false"-->
+               <!--enableDeleteByExample="false"-->
+               <!--enableSelectByExample="false"-->
+               <!--selectByExampleQueryId="false"/>-->
 
         <!--<table tableName="fb_coin" domainObjectName="Coin" mapperName="CoinDao"-->
                <!--enableCountByExample="false"-->
@@ -61,12 +61,12 @@
                <!--enableSelectByExample="false"-->
                <!--selectByExampleQueryId="false"/>-->
 
-        <table tableName="fb_sell_order" domainObjectName="SellOrder" mapperName="SellOrderDao"
-               enableCountByExample="false"
-               enableUpdateByExample="false"
-               enableDeleteByExample="false"
-               enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
+        <!--<table tableName="fb_sell_order" domainObjectName="SellOrder" mapperName="SellOrderDao"-->
+               <!--enableCountByExample="false"-->
+               <!--enableUpdateByExample="false"-->
+               <!--enableDeleteByExample="false"-->
+               <!--enableSelectByExample="false"-->
+               <!--selectByExampleQueryId="false"/>-->
 
         <!--<table tableName="fb_tx_record" domainObjectName="TxRecord" mapperName="TxRecordDao"-->
                <!--enableCountByExample="false"-->
@@ -74,6 +74,13 @@
                <!--enableDeleteByExample="false"-->
                <!--enableSelectByExample="false"-->
                <!--selectByExampleQueryId="false"/>-->
+
+        <table tableName="fb_tx_pair" domainObjectName="TxPair" mapperName="TxPairDao"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false"/>
 
     </context>
 </generatorConfiguration>

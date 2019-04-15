@@ -1,15 +1,16 @@
 package newbbb.trading;
 
+import newbbb.constant.NBGlobalConfig;
+import newbbb.enums.AssetUpdateEnum;
 import newbbb.enums.TxDirectionEnum;
-import newbbb.model.BuyOrder;
-import newbbb.model.Order;
-import newbbb.model.SellOrder;
+import newbbb.model.*;
+import newbbb.service.IAccountAssetService;
 import newbbb.service.IAccountService;
 import newbbb.service.IRedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Component("tradingTest")
 public class TradingTest {
@@ -18,7 +19,10 @@ public class TradingTest {
     private IRedisService redisService;
 
     @Autowired
-    private IAccountService accountService;
+    private IAccountService aService;
+
+    @Autowired
+    private IAccountAssetService aaService;
 
     // 1: 成功   2: 资产不足    3: code error
     public int makeTrade(Order requestOrder, TxDirectionEnum txDirectionEnum) {
@@ -39,8 +43,33 @@ public class TradingTest {
 
     // 买单
     public int makeBuyTrade(Order requestOrder) {
+        TxPair tp = NBGlobalConfig.TX_PAIRS[requestOrder.getTxPairId()];
+        // 判断是否存在资产记录
+        AccountAsset aa = aaService.getByAUidAndCId(requestOrder.getAccountUid(), tp.getaCoinId());
+        if(aa == null){
+            return 3;
+        }
+        // 判断资产是否足够
+        BigDecimal oTotalPrice = requestOrder.getPrice().multiply(requestOrder.getVolume());
+        if(aa.getAmt().compareTo(oTotalPrice) < 0){
+            return 2;
+        }
 
-        return 0;
+        // 冻结资产
+        aaService.updateAmt(aa.getAccountUid(), aa.getCoinId(), oTotalPrice, AssetUpdateEnum.SUB);
+        aaService.updateForzenAmt(aa.getAccountUid(), aa.getCoinId(), oTotalPrice, AssetUpdateEnum.SUB);
+
+        // 添加订单记录
+        
+
+        // 交易匹配
+        long timeNow = new Date().getTime();
+
+
+
+
+
+        return 3;
     }
 
     // 卖单

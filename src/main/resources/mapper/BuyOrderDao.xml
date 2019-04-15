@@ -150,4 +150,27 @@
       update_time = #{updateTime,jdbcType=BIGINT}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+
+
+
+
+
+
+
+
+  <select id="selectByUid" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from fb_buy_order
+    where uid = #{uid,jdbcType=INTEGER}
+  </select>
+  <update id="subVolume" parameterType="map">
+    update fb_buy_order
+    set volume = volume - #{volume,jdbcType=DECIMAL}, update_time = #{updateTime,jdbcType=BIGINT}
+    where uid = #{uid,jdbcType=CHAR}
+  </update>
+
+
 </mapper>

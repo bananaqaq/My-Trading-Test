@@ -2,6 +2,9 @@ package newbbb.dao;
 
 import newbbb.model.BuyOrder;
 
+import java.math.BigDecimal;
+import java.util.Map;
+
 public interface BuyOrderDao {
     int deleteByPrimaryKey(Integer id);
 
@@ -14,4 +17,9 @@ public interface BuyOrderDao {
     int updateByPrimaryKeySelective(BuyOrder record);
 
     int updateByPrimaryKey(BuyOrder record);
+
+
+
+
+    int subVolume(Map<String, Object> param);
 }
