@@ -1,7 +1,6 @@
 package newbbb.service;
 
 import newbbb.model.BuyOrder;
-
 import java.math.BigDecimal;
 
 public interface IBuyOrderService {

@@ -12,11 +12,11 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 
--- 导出 new_bbb 的数据库结构
-CREATE DATABASE IF NOT EXISTS `new_bbb` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
-USE `new_bbb`;
+-- 导出 nb 的数据库结构
+CREATE DATABASE IF NOT EXISTS `nb` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
+USE `nb`;
 
--- 导出  表 new_bbb.fb_account 结构
+-- 导出  表 nb.fb_account 结构
 CREATE TABLE IF NOT EXISTS `fb_account` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` char(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -25,8 +25,12 @@ CREATE TABLE IF NOT EXISTS `fb_account` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 数据导出被取消选择。
--- 导出  表 new_bbb.fb_account_asset 结构
+-- 正在导出表  nb.fb_account 的数据：~0 rows (大约)
+DELETE FROM `fb_account`;
+/*!40000 ALTER TABLE `fb_account` DISABLE KEYS */;
+/*!40000 ALTER TABLE `fb_account` ENABLE KEYS */;
+
+-- 导出  表 nb.fb_account_asset 结构
 CREATE TABLE IF NOT EXISTS `fb_account_asset` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `account_uid` char(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
@@ -38,11 +42,16 @@ CREATE TABLE IF NOT EXISTS `fb_account_asset` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 数据导出被取消选择。
--- 导出  表 new_bbb.fb_buy_order 结构
+-- 正在导出表  nb.fb_account_asset 的数据：~0 rows (大约)
+DELETE FROM `fb_account_asset`;
+/*!40000 ALTER TABLE `fb_account_asset` DISABLE KEYS */;
+/*!40000 ALTER TABLE `fb_account_asset` ENABLE KEYS */;
+
+-- 导出  表 nb.fb_buy_order 结构
 CREATE TABLE IF NOT EXISTS `fb_buy_order` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '唯一标识',
+  `tx_pair_id` int(11) NOT NULL COMMENT '交易对唯一标识',
   `account_uid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户唯一标识',
   `price` decimal(20,8) NOT NULL COMMENT '价格',
   `volume` decimal(20,8) NOT NULL COMMENT '数量',
@@ -53,8 +62,12 @@ CREATE TABLE IF NOT EXISTS `fb_buy_order` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 数据导出被取消选择。
--- 导出  表 new_bbb.fb_coin 结构
+-- 正在导出表  nb.fb_buy_order 的数据：~0 rows (大约)
+DELETE FROM `fb_buy_order`;
+/*!40000 ALTER TABLE `fb_buy_order` DISABLE KEYS */;
+/*!40000 ALTER TABLE `fb_buy_order` ENABLE KEYS */;
+
+-- 导出  表 nb.fb_coin 结构
 CREATE TABLE IF NOT EXISTS `fb_coin` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `zh_name` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -62,13 +75,21 @@ CREATE TABLE IF NOT EXISTS `fb_coin` (
   `create_time` bigint(20) NOT NULL,
   `update_time` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 数据导出被取消选择。
--- 导出  表 new_bbb.fb_sell_order 结构
+-- 正在导出表  nb.fb_coin 的数据：~2 rows (大约)
+DELETE FROM `fb_coin`;
+/*!40000 ALTER TABLE `fb_coin` DISABLE KEYS */;
+INSERT INTO `fb_coin` (`id`, `zh_name`, `en_name`, `create_time`, `update_time`) VALUES
+	(1, '比特币', 'BTC', 1555307949719, 1555307949719),
+	(2, '泰达币', 'USDT', 1555307949719, 1555307949719);
+/*!40000 ALTER TABLE `fb_coin` ENABLE KEYS */;
+
+-- 导出  表 nb.fb_sell_order 结构
 CREATE TABLE IF NOT EXISTS `fb_sell_order` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '唯一标识',
+  `tx_pair_id` int(11) NOT NULL,
   `account_uid` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户唯一标识',
   `price` decimal(20,8) NOT NULL COMMENT '价格',
   `volume` decimal(20,8) NOT NULL COMMENT '数量',
@@ -79,8 +100,30 @@ CREATE TABLE IF NOT EXISTS `fb_sell_order` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 数据导出被取消选择。
--- 导出  表 new_bbb.fb_tx_record 结构
+-- 正在导出表  nb.fb_sell_order 的数据：~0 rows (大约)
+DELETE FROM `fb_sell_order`;
+/*!40000 ALTER TABLE `fb_sell_order` DISABLE KEYS */;
+/*!40000 ALTER TABLE `fb_sell_order` ENABLE KEYS */;
+
+-- 导出  表 nb.fb_tx_pair 结构
+CREATE TABLE IF NOT EXISTS `fb_tx_pair` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `pair_name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0' COMMENT '交易对名称，例：BTC-USDT',
+  `f_coin_id` int(11) NOT NULL DEFAULT '0',
+  `a_coin_id` int(11) NOT NULL DEFAULT '0',
+  `create_time` bigint(20) NOT NULL DEFAULT '0',
+  `update_time` bigint(20) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 正在导出表  nb.fb_tx_pair 的数据：~1 rows (大约)
+DELETE FROM `fb_tx_pair`;
+/*!40000 ALTER TABLE `fb_tx_pair` DISABLE KEYS */;
+INSERT INTO `fb_tx_pair` (`id`, `pair_name`, `f_coin_id`, `a_coin_id`, `create_time`, `update_time`) VALUES
+	(1, 'BTC-USDT', 1, 2, 1555313111908, 1555313111908);
+/*!40000 ALTER TABLE `fb_tx_pair` ENABLE KEYS */;
+
+-- 导出  表 nb.fb_tx_record 结构
 CREATE TABLE IF NOT EXISTS `fb_tx_record` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` char(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
@@ -94,7 +137,11 @@ CREATE TABLE IF NOT EXISTS `fb_tx_record` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 数据导出被取消选择。
+-- 正在导出表  nb.fb_tx_record 的数据：~0 rows (大约)
+DELETE FROM `fb_tx_record`;
+/*!40000 ALTER TABLE `fb_tx_record` DISABLE KEYS */;
+/*!40000 ALTER TABLE `fb_tx_record` ENABLE KEYS */;
+
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
