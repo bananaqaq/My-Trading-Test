@@ -114,43 +114,4 @@
       update_time = #{updateTime,jdbcType=BIGINT}
     where id = #{id,jdbcType=INTEGER}
   </update>
-
-
-
-
-
-  <select id="selectByAUidAndCId" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select
-    <include refid="Base_Column_List" />
-    from fb_account_asset
-    where account_uid = #{accountUid, jdbcType=CHAR} and coin_id = #{coinId, jdbcType=INTEGER}
-  </select>
-
-  <!--更新资产-->
-  <update id="addAmt" parameterType="map">
-    update fb_account_asset
-    set amt = amt + #{amt,jdbcType=DECIMAL}
-    where account_uid = #{accountUid,jdbcType=CHAR} and coin_id = #{coinId, jdbcType=INTEGER}
-  </update>
-
-  <update id="subAmt" parameterType="map">
-    update fb_account_asset
-    set amt = amt - #{amt,jdbcType=DECIMAL}
-    where account_uid = #{accountUid,jdbcType=CHAR} and coin_id = #{coinId, jdbcType=INTEGER}
-  </update>
-
-  <!--更新冻结资产-->
-  <update id="addForzenAmt" parameterType="map">
-    update fb_account_asset
-    set forzen_amt = forzen_amt + #{amt,jdbcType=DECIMAL}
-    where account_uid = #{accountUid,jdbcType=CHAR} and coin_id = #{coinId, jdbcType=INTEGER}
-  </update>
-
-  <update id="subForzenAmt" parameterType="map">
-    update fb_account_asset
-    set forzen_amt = forzen_amt - #{amt,jdbcType=DECIMAL}
-    where account_uid = #{accountUid,jdbcType=CHAR} and coin_id = #{coinId, jdbcType=INTEGER}
-  </update>
-
-
 </mapper>

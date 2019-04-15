@@ -1,54 +1,15 @@
 package newbbb.service.impl;
 
-import io.netty.util.internal.StringUtil;
-import newbbb.dao.AccountAssetDao;
-import newbbb.dao.AccountDao;
-import newbbb.model.Account;
-import newbbb.model.AccountAsset;
 import newbbb.service.IAccountService;
-import newbbb.util.UUIdUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import java.util.Date;
 
 @Service
 public class AccountServiceImpl implements IAccountService {
 
-    @Autowired
-    private AccountDao aDao;
-
-    @Autowired
-    private AccountAssetDao aaDao;
-
     @Override
-    public int register(Account account) {
-        String uid = UUIdUtil.getUUID();
-        long timeNow = new Date().getTime();
-        account.setUid(uid);
-        account.setCreateTime(timeNow);
-        account.setUpdateTime(timeNow);
-        int aResult = aDao.insertSelective(account);
-
-        AccountAsset aa = new AccountAsset();
-        aa.setAccountUid(uid);
-        aa.setCreateTime(timeNow);
-        aa.setUpdateTime(timeNow);
-        int aaResult = aaDao.insertSelective(aa);
-
-        return aResult + aaResult;
-    }
-
-    @Override
-    public Account getByUid(String uid) {
-        if(StringUtil.isNullOrEmpty(uid)){
-            return null;
-        }
-        return aDao.selectByUid(uid);
-    }
-
-    @Override
-    public int updateByUid(Account account) {
-        return aDao.updateByUidSelective(account);
+    public void sayHello() {
+        System.out.println("hello");
     }
 
 }
