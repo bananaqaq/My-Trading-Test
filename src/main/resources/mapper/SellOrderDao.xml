@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="newbbb.model.SellOrder">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="uid" jdbcType="VARCHAR" property="uid" />
+    <result column="tx_pair_id" jdbcType="INTEGER" property="txPairId" />
     <result column="account_uid" jdbcType="VARCHAR" property="accountUid" />
     <result column="price" jdbcType="DECIMAL" property="price" />
     <result column="volume" jdbcType="DECIMAL" property="volume" />
@@ -13,7 +14,8 @@
     <result column="update_time" jdbcType="BIGINT" property="updateTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, uid, account_uid, price, volume, initial_volume, status, create_time, update_time
+    id, uid, tx_pair_id, account_uid, price, volume, initial_volume, status, create_time, 
+    update_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -26,14 +28,14 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="newbbb.model.SellOrder">
-    insert into fb_sell_order (id, uid, account_uid, 
-      price, volume, initial_volume, 
-      status, create_time, update_time
-      )
-    values (#{id,jdbcType=INTEGER}, #{uid,jdbcType=VARCHAR}, #{accountUid,jdbcType=VARCHAR}, 
-      #{price,jdbcType=DECIMAL}, #{volume,jdbcType=DECIMAL}, #{initialVolume,jdbcType=DECIMAL}, 
-      #{status,jdbcType=SMALLINT}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}
-      )
+    insert into fb_sell_order (id, uid, tx_pair_id, 
+      account_uid, price, volume, 
+      initial_volume, status, create_time, 
+      update_time)
+    values (#{id,jdbcType=INTEGER}, #{uid,jdbcType=VARCHAR}, #{txPairId,jdbcType=INTEGER}, 
+      #{accountUid,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, #{volume,jdbcType=DECIMAL}, 
+      #{initialVolume,jdbcType=DECIMAL}, #{status,jdbcType=SMALLINT}, #{createTime,jdbcType=BIGINT}, 
+      #{updateTime,jdbcType=BIGINT})
   </insert>
   <insert id="insertSelective" parameterType="newbbb.model.SellOrder">
     insert into fb_sell_order
@@ -43,6 +45,9 @@
       </if>
       <if test="uid != null">
         uid,
+      </if>
+      <if test="txPairId != null">
+        tx_pair_id,
       </if>
       <if test="accountUid != null">
         account_uid,
@@ -73,6 +78,9 @@
       <if test="uid != null">
         #{uid,jdbcType=VARCHAR},
       </if>
+      <if test="txPairId != null">
+        #{txPairId,jdbcType=INTEGER},
+      </if>
       <if test="accountUid != null">
         #{accountUid,jdbcType=VARCHAR},
       </if>
@@ -102,6 +110,9 @@
       <if test="uid != null">
         uid = #{uid,jdbcType=VARCHAR},
       </if>
+      <if test="txPairId != null">
+        tx_pair_id = #{txPairId,jdbcType=INTEGER},
+      </if>
       <if test="accountUid != null">
         account_uid = #{accountUid,jdbcType=VARCHAR},
       </if>
@@ -129,6 +140,7 @@
   <update id="updateByPrimaryKey" parameterType="newbbb.model.SellOrder">
     update fb_sell_order
     set uid = #{uid,jdbcType=VARCHAR},
+      tx_pair_id = #{txPairId,jdbcType=INTEGER},
       account_uid = #{accountUid,jdbcType=VARCHAR},
       price = #{price,jdbcType=DECIMAL},
       volume = #{volume,jdbcType=DECIMAL},

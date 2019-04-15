@@ -11,7 +11,7 @@
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://127.0.0.1:3306/new_bbb"
+                        connectionURL="jdbc:mysql://127.0.0.1:3306/nb"
                         userId="root"
                         password="123456">
         </jdbcConnection>
@@ -33,19 +33,19 @@
             <property name="enableSubPackages" value="true" />
         </javaClientGenerator>
 
-       <table tableName="fb_account" domainObjectName="Account" mapperName="AccountDao"
-              enableCountByExample="false"
-              enableUpdateByExample="false"
-              enableDeleteByExample="false"
-              enableSelectByExample="false"
-              selectByExampleQueryId="false"/>
+       <!--<table tableName="fb_account" domainObjectName="Account" mapperName="AccountDao"-->
+              <!--enableCountByExample="false"-->
+              <!--enableUpdateByExample="false"-->
+              <!--enableDeleteByExample="false"-->
+              <!--enableSelectByExample="false"-->
+              <!--selectByExampleQueryId="false"/>-->
 
-        <table tableName="fb_account_asset" domainObjectName="AccountAsset" mapperName="AccountAssetDao"
-               enableCountByExample="false"
-               enableUpdateByExample="false"
-               enableDeleteByExample="false"
-               enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
+        <!--<table tableName="fb_account_asset" domainObjectName="AccountAsset" mapperName="AccountAssetDao"-->
+               <!--enableCountByExample="false"-->
+               <!--enableUpdateByExample="false"-->
+               <!--enableDeleteByExample="false"-->
+               <!--enableSelectByExample="false"-->
+               <!--selectByExampleQueryId="false"/>-->
 
         <table tableName="fb_buy_order" domainObjectName="BuyOrder" mapperName="BuyOrderDao"
                enableCountByExample="false"
@@ -54,12 +54,12 @@
                enableSelectByExample="false"
                selectByExampleQueryId="false"/>
 
-        <table tableName="fb_coin" domainObjectName="Coin" mapperName="CoinDao"
-               enableCountByExample="false"
-               enableUpdateByExample="false"
-               enableDeleteByExample="false"
-               enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
+        <!--<table tableName="fb_coin" domainObjectName="Coin" mapperName="CoinDao"-->
+               <!--enableCountByExample="false"-->
+               <!--enableUpdateByExample="false"-->
+               <!--enableDeleteByExample="false"-->
+               <!--enableSelectByExample="false"-->
+               <!--selectByExampleQueryId="false"/>-->
 
         <table tableName="fb_sell_order" domainObjectName="SellOrder" mapperName="SellOrderDao"
                enableCountByExample="false"
@@ -68,12 +68,12 @@
                enableSelectByExample="false"
                selectByExampleQueryId="false"/>
 
-        <table tableName="fb_tx_record" domainObjectName="TxRecord" mapperName="TxRecordDao"
-               enableCountByExample="false"
-               enableUpdateByExample="false"
-               enableDeleteByExample="false"
-               enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
+        <!--<table tableName="fb_tx_record" domainObjectName="TxRecord" mapperName="TxRecordDao"-->
+               <!--enableCountByExample="false"-->
+               <!--enableUpdateByExample="false"-->
+               <!--enableDeleteByExample="false"-->
+               <!--enableSelectByExample="false"-->
+               <!--selectByExampleQueryId="false"/>-->
 
     </context>
 </generatorConfiguration>

@@ -19,6 +19,7 @@
         <mysql.connector.version>5.1.45</mysql.connector.version>
         <dbcp.version>2.2.0</dbcp.version>
         <pagehelper.version>4.0.0</pagehelper.version>
+        <fastjson.version>1.2.44</fastjson.version>
     </properties>
 
     <dependencies>
@@ -105,6 +106,14 @@
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper</artifactId>
             <version>${pagehelper.version}</version>
+        </dependency>
+
+
+        <!-- fastjson json -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
         </dependency>
 
     </dependencies>
