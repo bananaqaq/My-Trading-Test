@@ -2,10 +2,7 @@ package newbbb.trading;
 
 import newbbb.constant.NBGlobalConfig;
 import newbbb.enums.TxDirectionEnum;
-import newbbb.model.Account;
-import newbbb.model.BuyOrder;
-import newbbb.model.Coin;
-import newbbb.model.TxPair;
+import newbbb.model.*;
 import newbbb.service.IAccountService;
 import newbbb.service.ICoinService;
 import newbbb.service.IRedisService;
@@ -15,8 +12,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class TestMain {
 
@@ -91,7 +87,19 @@ public class TestMain {
         requestOrder.setVolume(new BigDecimal("2"));
 
         int r = instance.makeTrade(requestOrder, TxDirectionEnum.BUY);
+
+//        SellOrder requestOrder = new SellOrder();
+//        requestOrder.setTxPairId(1);
+//        requestOrder.setAccountUid("1b855c98f2b341ae8c1b29728ffc64ab");
+//        requestOrder.setPrice(new BigDecimal("10"));
+//        requestOrder.setVolume(new BigDecimal("2"));
+//
+//        int r = instance.makeTrade(requestOrder, TxDirectionEnum.SELL);
+
         System.out.println(r);
+
+
+
 
 
     }
