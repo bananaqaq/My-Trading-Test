@@ -2,7 +2,7 @@ package newbbb.dao;
 
 import newbbb.model.BuyOrder;
 
-import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 public interface BuyOrderDao {
@@ -21,5 +21,10 @@ public interface BuyOrderDao {
 
 
 
+
+    BuyOrder selectByUid(String uid);
+
     int subVolume(Map<String, Object> param);
+
+    List<BuyOrder> selectUncompletedList(Map<String, Object> param);
 }

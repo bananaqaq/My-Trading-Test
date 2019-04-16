@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -45,5 +46,14 @@ public class BuyOrderServiceImpl implements IBuyOrderService {
         return 0;
     }
 
-
+    @Override
+    public List<BuyOrder> getUncompletedList(int txPairId, int limitNum) {
+        if(limitNum > 0){
+            Map<String, Object> param = new HashMap<>();
+            param.put("txPairId", txPairId);
+            param.put("limitNum", limitNum);
+            return boDao.selectUncompletedList(param);
+        }
+        return null;
+    }
 }

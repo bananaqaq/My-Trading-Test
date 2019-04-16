@@ -150,4 +150,43 @@
       update_time = #{updateTime,jdbcType=BIGINT}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+
+
+
+
+
+
+
+
+  <select id="selectByUid" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from fb_sell_order
+    where uid = #{uid,jdbcType=INTEGER}
+  </select>
+  <update id="subVolume" parameterType="map">
+    update fb_sell_order
+    set volume = volume - #{volume,jdbcType=DECIMAL},
+    status = (
+        case
+        when volume - 100 = 0
+        then 3
+        when volume - 100 > 0
+        then 2
+        end
+    ),
+    update_time = #{updateTime,jdbcType=BIGINT}
+    where uid = #{uid,jdbcType=CHAR}
+  </update>
+  <select id="selectUncompletedList" parameterType="map" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from fb_sell_order
+    where tx_pair_id = #{txPairId,jdbcType=INTEGER} and status = 1 or status = 2
+    order by price, create_time
+    limit #{limitNum,jdbcType=INTEGER}
+  </select>
+
 </mapper>

@@ -2,6 +2,9 @@ package newbbb.dao;
 
 import newbbb.model.SellOrder;
 
+import java.util.List;
+import java.util.Map;
+
 public interface SellOrderDao {
     int deleteByPrimaryKey(Integer id);
 
@@ -14,4 +17,12 @@ public interface SellOrderDao {
     int updateByPrimaryKeySelective(SellOrder record);
 
     int updateByPrimaryKey(SellOrder record);
+
+
+
+    SellOrder selectByUid(String uid);
+
+    int subVolume(Map<String, Object> param);
+
+    List<SellOrder> selectUncompletedList(Map<String, Object> param);
 }

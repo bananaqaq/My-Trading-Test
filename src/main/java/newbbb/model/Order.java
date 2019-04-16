@@ -102,4 +102,16 @@ public class Order {
     public void setUpdateTime(Long updateTime) {
         this.updateTime = updateTime;
     }
+
+
+
+
+
+    public void subVolume(BigDecimal volume) throws Exception {
+        if (this.volume.subtract(volume).compareTo(BigDecimal.ZERO) < 0) {
+            throw new Exception("order_sub_volume volume invalid");
+        } else {
+            this.volume = this.volume.subtract(volume);
+        }
+    }
 }

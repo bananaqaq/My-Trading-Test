@@ -1,15 +1,20 @@
 package newbbb.trading;
 
 import newbbb.constant.NBGlobalConfig;
+import newbbb.enums.TxDirectionEnum;
 import newbbb.model.Account;
+import newbbb.model.BuyOrder;
 import newbbb.model.Coin;
 import newbbb.model.TxPair;
 import newbbb.service.IAccountService;
 import newbbb.service.ICoinService;
 import newbbb.service.IRedisService;
 import newbbb.service.ITxPairService;
+import newbbb.util.UUIdUtil;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -69,11 +74,24 @@ public class TestMain {
         tp.setUpdateTime(timeNow);
         txPairService.add(tp);*/
 
+
+        // 添加account数据
+//        accountService.register(new Account());
+
+
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws Exception {
         TradingTest instance = context.getBean(TradingTest.class);
-//        instance.makeTrade(null);
+
+        BuyOrder requestOrder = new BuyOrder();
+        requestOrder.setTxPairId(1);
+        requestOrder.setAccountUid("1b855c98f2b341ae8c1b29728ffc64ab");
+        requestOrder.setPrice(new BigDecimal("10"));
+        requestOrder.setVolume(new BigDecimal("2"));
+
+        int r = instance.makeTrade(requestOrder, TxDirectionEnum.BUY);
+        System.out.println(r);
 
 
     }

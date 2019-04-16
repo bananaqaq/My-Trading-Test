@@ -122,7 +122,7 @@
 
 
 
-  <select id="selectByAUidAndCId" parameterType="java.lang.String" resultMap="BaseResultMap">
+  <select id="selectByAUidAndCId" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from fb_account_asset
