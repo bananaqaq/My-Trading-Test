@@ -168,15 +168,16 @@
   </select>
   <update id="subVolume" parameterType="map">
     update fb_buy_order
-    set volume = volume - #{volume,jdbcType=DECIMAL},
+    set
     status = (
         case
-        when volume - 100 = 0
+        when volume - #{volume,jdbcType=DECIMAL} = 0
         then 3
-        when volume - 100 > 0
+        when volume - #{volume,jdbcType=DECIMAL} &gt; 0
         then 2
         end
     ),
+    volume = volume - #{volume,jdbcType=DECIMAL},
     update_time = #{updateTime,jdbcType=BIGINT}
     where uid = #{uid,jdbcType=CHAR}
   </update>

@@ -4,7 +4,7 @@ package newbbb.service;
 import newbbb.model.Account;
 
 public interface IAccountService {
-    int register(Account account);
+    String register(Account account);
 
     Account getByUid(String uid);
 

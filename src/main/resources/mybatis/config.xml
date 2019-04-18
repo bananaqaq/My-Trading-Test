@@ -12,8 +12,8 @@
         <setting name="aggressiveLazyLoading" value="true"/>
         <!-- 设置日志 -->
         <setting name="logPrefix" value="mybatis."/>
-        <!-- 打印SQL日志 
-        <setting name="logImpl" value="STDOUT_LOGGING" />-->
+        <!-- 打印SQL日志  -->
+        <!--<setting name="logImpl" value="STDOUT_LOGGING" />-->
     </settings>
     <typeAliases>
         <package name="newbbb.model"/>

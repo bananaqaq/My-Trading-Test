@@ -25,7 +25,7 @@ public class AccountServiceImpl implements IAccountService {
     private AccountAssetDao aaDao;
 
     @Override
-    public int register(Account account) {
+    public String register(Account account) {
         String uid = UUIdUtil.getUUID();
         long timeNow = new Date().getTime();
         account.setUid(uid);
@@ -38,7 +38,8 @@ public class AccountServiceImpl implements IAccountService {
                 AccountAsset aa = new AccountAsset();
                 aa.setAccountUid(uid);
                 aa.setCoinId(coin.getId());
-                aa.setAmt(BigDecimal.ZERO);
+//                aa.setAmt(BigDecimal.ZERO);
+                aa.setAmt(new BigDecimal("1000"));
                 aa.setForzenAmt(BigDecimal.ZERO);
                 aa.setCreateTime(timeNow);
                 aa.setUpdateTime(timeNow);
@@ -46,7 +47,7 @@ public class AccountServiceImpl implements IAccountService {
             }
         }
 
-        return 1;
+        return uid;
     }
 
     @Override
