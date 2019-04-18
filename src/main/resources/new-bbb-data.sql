@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `fb_account` (
   `create_time` bigint(20) DEFAULT NULL,
   `update_time` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=905 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 正在导出表  nb.fb_account 的数据：~4 rows (大约)
 DELETE FROM `fb_account`;
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `fb_account_asset` (
   `create_time` bigint(20) NOT NULL DEFAULT '0',
   `update_time` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1809 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 正在导出表  nb.fb_account_asset 的数据：~8 rows (大约)
 DELETE FROM `fb_account_asset`;
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `fb_buy_order` (
   `create_time` bigint(20) NOT NULL,
   `update_time` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1187 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 正在导出表  nb.fb_buy_order 的数据：~0 rows (大约)
 DELETE FROM `fb_buy_order`;
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS `fb_sell_order` (
   `create_time` bigint(20) NOT NULL,
   `update_time` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 正在导出表  nb.fb_sell_order 的数据：~0 rows (大约)
 DELETE FROM `fb_sell_order`;
@@ -122,13 +122,13 @@ CREATE TABLE IF NOT EXISTS `fb_tx_pair` (
   `create_time` bigint(20) NOT NULL DEFAULT '0',
   `update_time` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 正在导出表  nb.fb_tx_pair 的数据：~1 rows (大约)
 DELETE FROM `fb_tx_pair`;
 /*!40000 ALTER TABLE `fb_tx_pair` DISABLE KEYS */;
 INSERT INTO `fb_tx_pair` (`id`, `pair_name`, `f_coin_id`, `a_coin_id`, `create_time`, `update_time`) VALUES
-	(2, 'BTC-USDT', 1, 2, 1555569435892, 1555569435892);
+	(1, 'BTC-USDT', 1, 2, 1555569435892, 1555569435892);
 /*!40000 ALTER TABLE `fb_tx_pair` ENABLE KEYS */;
 
 -- 导出  表 nb.fb_tx_record 结构
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS `fb_tx_record` (
   `create_time` bigint(20) NOT NULL DEFAULT '0',
   `update_time` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=776 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 正在导出表  nb.fb_tx_record 的数据：~0 rows (大约)
 DELETE FROM `fb_tx_record`;

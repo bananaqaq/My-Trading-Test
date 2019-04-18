@@ -57,4 +57,13 @@ public class AccountAssetServiceImpl implements IAccountAssetService {
         }
     }
 
+    @Override
+    public int forzenAsset(String accountUid, Integer coinId, BigDecimal amt) {
+        Map<String, Object> param = new HashMap<>();
+        param.put("accountUid", accountUid);
+        param.put("coinId", coinId);
+        param.put("amt", amt);
+        return aaDao.forzenAsset(param);
+    }
+
 }

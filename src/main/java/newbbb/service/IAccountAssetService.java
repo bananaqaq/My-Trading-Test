@@ -12,4 +12,6 @@ public interface IAccountAssetService {
 
     int updateForzenAmt(String accountUid, Integer coinId, BigDecimal amt, AssetUpdateEnum assetUpdateEnum);
 
+    int forzenAsset(String accountUid, Integer coinId, BigDecimal amt);
+
 }

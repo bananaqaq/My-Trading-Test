@@ -129,9 +129,9 @@ public class TestMain {
         }*/
 
 
-        TxPair tp = NBGlobalConfig.TX_PAIRS[2];
-        int userNum = 100;
-        int tradingNum = 8;
+        TxPair tp = NBGlobalConfig.TX_PAIRS[1];
+        int userNum = 50;
+        int tradingNum = 6;
         int fAmtMax = 1000;
         int aAmtMax = 1000;
         Random random = new Random();
@@ -187,6 +187,9 @@ public class TestMain {
                 errNum++;
             }
             System.out.println(i + ": " + r + ": " + (txEndTime - txStartTime));
+//            if(i==10){
+//                break;
+//            }
         }
 
         long endTime = new Date().getTime();

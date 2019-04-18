@@ -32,4 +32,6 @@ public interface AccountAssetDao {
     int addForzenAmt(Map<String, Object> param);
 
     int subForzenAmt(Map<String, Object> param);
+
+    int forzenAsset(Map<String, Object> param);
 }
