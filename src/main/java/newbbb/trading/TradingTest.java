@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 
 @Component("tradingTest")
 public class TradingTest {
@@ -35,7 +36,7 @@ public class TradingTest {
     private ITxRecordService trService;
 
     // requestOrder需携带参数 1：txPairId     2：accountUid    3：price     4：volume
-    // 返回值 1: 成功   2: 资产不足    3: code error
+    // 返回值 1: 成功   2: 失败    3: code error
     public int makeTrade(Order requestOrder, TxDirectionEnum txDirectionEnum) throws Exception {
         // 判断requestOrder参数是否正确
         if (requestOrder == null || txDirectionEnum == null || requestOrder.getVolume().compareTo(BigDecimal.ZERO) <= 0 || requestOrder.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
@@ -61,24 +62,10 @@ public class TradingTest {
         int aCoinId = tp.getaCoinId();
         BigDecimal oTotalPrice = requestOrder.getPrice().multiply(requestOrder.getVolume());
 
-
-        /*// 判断是否存在资产记录
-        AccountAsset aa = aaService.getByAUidAndCId(requestOrder.getAccountUid(), tp.getaCoinId());
-        if (aa == null) {
-            return 3;
-        }
-        // 判断资产是否足够
-        if (aa.getAmt().compareTo(oTotalPrice) < 0) {
+        //冻结资产
+        if (aaService.forzenAsset(accountUid, aCoinId, oTotalPrice) == 0) {
             return 2;
         }
-
-        // 冻结资产
-        aaService.updateAmt(aa.getAccountUid(), aa.getCoinId(), oTotalPrice, AssetUpdateEnum.SUB);
-        aaService.updateForzenAmt(aa.getAccountUid(), aa.getCoinId(), oTotalPrice, AssetUpdateEnum.ADD);*/
-
-
-        //冻结资产
-        aaService.forzenAsset(accountUid, aCoinId, oTotalPrice);
 
         // 添加订单记录
         boService.add((BuyOrder) requestOrder);
@@ -88,7 +75,9 @@ public class TradingTest {
         int maxFlag = 5;
         int limitNum = 1;
 
+        long startTime = new Date().getTime();
         List<SellOrder> soList = soService.getUncompletedList(tp.getId(), limitNum);
+        long midTime = new Date().getTime();
         Iterator<SellOrder> soIterator = soList.iterator();
 
         if (soIterator.hasNext()) {
@@ -124,12 +113,12 @@ public class TradingTest {
                 soService.subVolume(so.getUid(), txVolume);
 
                 // 更新用户资产
-                aaService.updateForzenAmt(requestOrder.getAccountUid(), tp.getaCoinId(), txVolume.multiply(rPrice), AssetUpdateEnum.SUB);
-                aaService.updateAmt(requestOrder.getAccountUid(), tp.getaCoinId(), txVolume.multiply(rPrice.subtract(sPrice)), AssetUpdateEnum.ADD);
-                aaService.updateAmt(requestOrder.getAccountUid(), tp.getfCoinId(), txVolume, AssetUpdateEnum.ADD);
+                aaService.updateForzenAmt(requestOrder.getAccountUid(), aCoinId, txVolume.multiply(rPrice), AssetUpdateEnum.SUB);
+                aaService.updateAmt(requestOrder.getAccountUid(), aCoinId, txVolume.multiply(rPrice.subtract(sPrice)), AssetUpdateEnum.ADD);
+                aaService.updateAmt(requestOrder.getAccountUid(), fCoinId, txVolume, AssetUpdateEnum.ADD);
 
-                aaService.updateForzenAmt(so.getAccountUid(), tp.getfCoinId(), txVolume, AssetUpdateEnum.SUB);
-                aaService.updateAmt(so.getAccountUid(), tp.getaCoinId(), txTotalPrice, AssetUpdateEnum.ADD);
+                aaService.updateForzenAmt(so.getAccountUid(), fCoinId, txVolume, AssetUpdateEnum.SUB);
+                aaService.updateAmt(so.getAccountUid(), aCoinId, txTotalPrice, AssetUpdateEnum.ADD);
 
                 // 添加交易记录
                 TxRecord txRecord = new TxRecord();
@@ -148,10 +137,13 @@ public class TradingTest {
                 }
             }
         }
+        long endTime = new Date().getTime();
         BigDecimal totalTxVolume = requestOrder.getInitialVolume().subtract(requestOrder.getVolume());
         if (totalTxVolume.compareTo(BigDecimal.ZERO) > 0) {
             boService.subVolume(requestOrder.getUid(), totalTxVolume);
         }
+        System.out.println("\tsearch:" + (midTime - startTime));
+        System.out.println("\tdeal:" + (endTime - midTime));
         return 1;
     }
 
@@ -163,23 +155,10 @@ public class TradingTest {
         int fCoinId = tp.getfCoinId();
         int aCoinId = tp.getaCoinId();
 
-        /*// 判断是否存在资产记录
-        AccountAsset aa = aaService.getByAUidAndCId(requestOrder.getAccountUid(), tp.getfCoinId());
-        if (aa == null) {
-            return 3;
-        }
-
-        // 判断资产是否足够
-        if (aa.getAmt().compareTo(requestOrder.getVolume()) < 0) {
+        //冻结资产
+        if (aaService.forzenAsset(accountUid, fCoinId, requestOrder.getVolume()) == 0) {
             return 2;
         }
-
-        // 冻结资产
-        aaService.updateAmt(aa.getAccountUid(), aa.getCoinId(), requestOrder.getVolume(), AssetUpdateEnum.SUB);
-        aaService.updateForzenAmt(aa.getAccountUid(), aa.getCoinId(), requestOrder.getVolume(), AssetUpdateEnum.ADD);*/
-
-        //冻结资产
-        aaService.forzenAsset(accountUid, aCoinId, requestOrder.getVolume());
 
         // 添加订单记录
         soService.add((SellOrder) requestOrder);
@@ -189,7 +168,9 @@ public class TradingTest {
         int maxFlag = 5;
         int limitNum = 1;
 
+        long startTime = new Date().getTime();
         List<BuyOrder> boList = boService.getUncompletedList(tp.getId(), limitNum);
+        long midTime = new Date().getTime();
         Iterator<BuyOrder> boIterator = boList.iterator();
 
 
@@ -225,11 +206,11 @@ public class TradingTest {
                 boService.subVolume(bo.getUid(), txVolume);
 
                 // 更新用户资产
-                aaService.updateForzenAmt(requestOrder.getAccountUid(), tp.getfCoinId(), txVolume, AssetUpdateEnum.SUB);
-                aaService.updateAmt(requestOrder.getAccountUid(), tp.getaCoinId(), txTotalPrice, AssetUpdateEnum.ADD);
+                aaService.updateForzenAmt(requestOrder.getAccountUid(), fCoinId, txVolume, AssetUpdateEnum.SUB);
+                aaService.updateAmt(requestOrder.getAccountUid(), aCoinId, txTotalPrice, AssetUpdateEnum.ADD);
 
-                aaService.updateForzenAmt(bo.getAccountUid(), tp.getaCoinId(), txTotalPrice, AssetUpdateEnum.SUB);
-                aaService.updateAmt(bo.getAccountUid(), tp.getfCoinId(), txVolume, AssetUpdateEnum.ADD);
+                aaService.updateForzenAmt(bo.getAccountUid(), aCoinId, txTotalPrice, AssetUpdateEnum.SUB);
+                aaService.updateAmt(bo.getAccountUid(), fCoinId, txVolume, AssetUpdateEnum.ADD);
 
                 // 添加交易记录
                 TxRecord txRecord = new TxRecord();
@@ -248,10 +229,13 @@ public class TradingTest {
                 }
             }
         }
+        long endTime = new Date().getTime();
         BigDecimal totalTxVolume = requestOrder.getInitialVolume().subtract(requestOrder.getVolume());
         if (totalTxVolume.compareTo(BigDecimal.ZERO) > 0) {
             soService.subVolume(requestOrder.getUid(), totalTxVolume);
         }
+        System.out.println("\tsearch:" + (midTime - startTime));
+        System.out.println("\tdeal:" + (endTime - midTime));
         return 1;
     }
 

@@ -156,21 +156,11 @@
   </update>
 
   <!--冻结资产-->
-  <update id="forzenAmt" parameterType="map">
+  <update id="forzenAsset" parameterType="map">
     update fb_account_asset
     set
-    forzen_amt = (
-        CASE
-        WHEN amt - #{amt,jdbcType=DECIMAL} &gt;= 0 THEN forzen_amt + #{amt,jdbcType=DECIMAL}
-        ELSE forzen_amt
-        END
-    ),
-    amt = (
-        CASE
-        WHEN amt - #{amt,jdbcType=DECIMAL} &gt;= 0 THEN amt - #{amt,jdbcType=DECIMAL}
-        ELSE amt
-        END
-    )
+    forzen_amt = forzen_amt + #{amt,jdbcType=DECIMAL},
+    amt = amt - #{amt,jdbcType=DECIMAL}
     where account_uid = #{accountUid,jdbcType=CHAR} and coin_id = #{coinId, jdbcType=INTEGER}
   </update>
 

@@ -38,8 +38,7 @@ public class AccountServiceImpl implements IAccountService {
                 AccountAsset aa = new AccountAsset();
                 aa.setAccountUid(uid);
                 aa.setCoinId(coin.getId());
-//                aa.setAmt(BigDecimal.ZERO);
-                aa.setAmt(new BigDecimal("1000"));
+                aa.setAmt(BigDecimal.ZERO);
                 aa.setForzenAmt(BigDecimal.ZERO);
                 aa.setCreateTime(timeNow);
                 aa.setUpdateTime(timeNow);
@@ -61,6 +60,11 @@ public class AccountServiceImpl implements IAccountService {
     @Override
     public int updateByUid(Account account) {
         return aDao.updateByUidSelective(account);
+    }
+
+    @Override
+    public String[] getAllAccount(int limitNum) {
+        return aDao.selectAllAccount(limitNum);
     }
 
 }

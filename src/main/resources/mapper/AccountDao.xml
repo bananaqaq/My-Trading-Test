@@ -114,4 +114,10 @@
     </set>
     where uid = #{uid,jdbcType=CHAR}
   </update>
+  <select id="selectAllAccount" parameterType="java.lang.Integer" resultType="java.lang.String">
+    select
+    uid
+    from fb_account
+    where id &gt; 2 limit #{limit,jdbcType=INTEGER};
+  </select>
 </mapper>

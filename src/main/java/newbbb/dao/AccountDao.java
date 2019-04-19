@@ -24,4 +24,6 @@ public interface AccountDao {
     Account selectByUid(String uid);
 
     int updateByUidSelective(Account account);
+
+    String[] selectAllAccount(Integer limitNum);
 }

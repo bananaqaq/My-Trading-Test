@@ -19,7 +19,7 @@ public class AccountAssetServiceImpl implements IAccountAssetService {
 
     @Override
     public AccountAsset getByAUidAndCId(String accountUid, Integer coinId) {
-        if(StringUtil.isNullOrEmpty(accountUid) || coinId == null){
+        if (StringUtil.isNullOrEmpty(accountUid) || coinId == null) {
             return null;
         }
         return aaDao.selectByAUidAndCId(accountUid, coinId);
@@ -31,7 +31,7 @@ public class AccountAssetServiceImpl implements IAccountAssetService {
         map.put("accountUid", accountUid);
         map.put("coinId", coinId);
         map.put("amt", amt);
-        switch (assetUpdateEnum){
+        switch (assetUpdateEnum) {
             case ADD:
                 return aaDao.addAmt(map);
             case SUB:
@@ -47,7 +47,7 @@ public class AccountAssetServiceImpl implements IAccountAssetService {
         map.put("accountUid", accountUid);
         map.put("coinId", coinId);
         map.put("amt", amt);
-        switch (assetUpdateEnum){
+        switch (assetUpdateEnum) {
             case ADD:
                 return aaDao.addForzenAmt(map);
             case SUB:
@@ -60,6 +60,10 @@ public class AccountAssetServiceImpl implements IAccountAssetService {
     @Override
     public int forzenAsset(String accountUid, Integer coinId, BigDecimal amt) {
         Map<String, Object> param = new HashMap<>();
+        AccountAsset aa = aaDao.selectByAUidAndCId(accountUid, coinId);
+        if (aa != null && aa.getAmt().compareTo(amt) <= 0) {
+            return 0;
+        }
         param.put("accountUid", accountUid);
         param.put("coinId", coinId);
         param.put("amt", amt);

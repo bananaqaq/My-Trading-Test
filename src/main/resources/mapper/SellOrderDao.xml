@@ -185,7 +185,7 @@
     select
     <include refid="Base_Column_List" />
     from fb_sell_order
-    where tx_pair_id = #{txPairId,jdbcType=INTEGER} and status = 1 or status = 2
+    where tx_pair_id = #{txPairId,jdbcType=INTEGER} and status in (1,2)
     order by price, create_time
     limit #{limitNum,jdbcType=INTEGER}
   </select>

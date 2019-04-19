@@ -129,42 +129,54 @@ public class TestMain {
         }*/
 
 
-        TxPair tp = NBGlobalConfig.TX_PAIRS[1];
-        int userNum = 50;
-        int tradingNum = 6;
-        int fAmtMax = 1000;
-        int aAmtMax = 1000;
+        TxPair tp = NBGlobalConfig.TX_PAIRS[2];
+        int userNum = 40;
+        int tradingNum = 8;
+        int fAmtMax = 100;
+        int aAmtMax = 10000;
+
+        int volumeMax = (int) (fAmtMax / tradingNum / 1.0);
+        int volumeMin = 1;
+        int volumeBound = volumeMax - volumeMin;
+
+        int priceMax = (int) (aAmtMax / tradingNum / volumeMax / 1.0);
+        int priceMin = (int) (priceMax * 0.8);
+        int priceBound = priceMax - priceMin;
+
+        String[] accountUidArr = accountService.getAllAccount(userNum);
         Random random = new Random();
         ArrayList<TradeInfo> oList = new ArrayList<>();
 
         long startTime = new Date().getTime();
 
         for (int i = 0; i < userNum; i++) {
-            String accountUid = accountService.register(new Account());
+            String accountUid = accountUidArr[i];
+            BigDecimal fAmtTotal = new BigDecimal(fAmtMax);
+            BigDecimal aAmtTotal = new BigDecimal(aAmtMax);
 
             for (int j = 0; j < tradingNum / 2; j++) {
-                AccountAsset faa = accountAssetService.getByAUidAndCId(accountUid, tp.getfCoinId());
-                if (faa.getAmt().compareTo(BigDecimal.ZERO) == 0) {
+                double price = priceMin + random.nextInt(priceBound * 10) / 10.0;
+                double volume = volumeMin + random.nextInt(volumeBound * 10) / 10.0;
+                aAmtTotal = aAmtTotal.subtract(new BigDecimal(price * volume));
+                if(aAmtTotal.compareTo(BigDecimal.ZERO) < 0){
                     break;
                 }
-                int totalPrice = random.nextInt(aAmtMax / tradingNum) + 10;
-                int price = random.nextInt(100) + 1;
-                int volume = totalPrice / price + 1;
                 System.out.println("B\t" + volume + "\t\t\t" + price + "\t\t\t");
                 BuyOrder bo = new BuyOrder(tp.getId(), accountUid, price + "", volume + "");
                 oList.add(new TradeInfo(bo, TxDirectionEnum.BUY));
             }
             for (int j = 0; j < tradingNum / 2; j++) {
-                AccountAsset aaa = accountAssetService.getByAUidAndCId(accountUid, tp.getaCoinId());
-                if (aaa.getAmt().compareTo(BigDecimal.ZERO) == 0) {
+                double price = priceMin + random.nextInt(priceBound * 10) / 10.0;
+                double volume = volumeMin + random.nextInt(volumeBound * 10) / 10.0;
+                fAmtTotal = fAmtTotal.subtract(new BigDecimal(volume));
+                if(fAmtTotal.compareTo(BigDecimal.ZERO) < 0){
                     break;
                 }
-                double volume = random.nextInt(fAmtMax / tradingNum) + 2;
-                double price = random.nextInt(100) + 1;
                 System.out.println("S\t" + volume + "\t\t\t" + price + "\t\t\t");
                 SellOrder so = new SellOrder(tp.getId(), accountUid, price + "", volume + "");
                 oList.add(new TradeInfo(so, TxDirectionEnum.SELL));
             }
+
             System.out.println(i + "==================================");
         }
 
@@ -197,6 +209,7 @@ public class TestMain {
         System.out.println("make trade finish:" + (endTime - middleTime));
         System.out.println("successNum:" + successNum);
         System.out.println("errNum:" + errNum);
+        System.out.println("time avg:" + (endTime - middleTime) / (userNum * tradingNum));
 
     }
 
