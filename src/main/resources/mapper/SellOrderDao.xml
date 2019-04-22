@@ -14,7 +14,7 @@
     <result column="update_time" jdbcType="BIGINT" property="updateTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, uid, tx_pair_id, account_uid, price, volume, initial_volume, status, create_time, 
+    id, uid, tx_pair_id, account_uid, price, volume, initial_volume, status, create_time,
     update_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
@@ -29,11 +29,11 @@
   </delete>
   <insert id="insert" parameterType="newbbb.model.SellOrder">
     insert into fb_sell_order (id, uid, tx_pair_id, 
-      account_uid, price, volume, 
+      account_uid, price, volume,
       initial_volume, status, create_time, 
       update_time)
     values (#{id,jdbcType=INTEGER}, #{uid,jdbcType=VARCHAR}, #{txPairId,jdbcType=INTEGER}, 
-      #{accountUid,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, #{volume,jdbcType=DECIMAL}, 
+      #{accountUid,jdbcType=VARCHAR}, #{price,jdbcType=DECIMAL}, #{volume,jdbcType=DECIMAL},
       #{initialVolume,jdbcType=DECIMAL}, #{status,jdbcType=SMALLINT}, #{createTime,jdbcType=BIGINT}, 
       #{updateTime,jdbcType=BIGINT})
   </insert>

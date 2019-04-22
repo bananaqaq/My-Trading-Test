@@ -130,7 +130,7 @@ public class TestMain {
 
 
         TxPair tp = NBGlobalConfig.TX_PAIRS[2];
-        int userNum = 40;
+        int userNum = 30;
         int tradingNum = 8;
         int fAmtMax = 100;
         int aAmtMax = 10000;

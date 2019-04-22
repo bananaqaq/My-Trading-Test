@@ -5,9 +5,9 @@
 -- DELETE
 -- FROM fb_tx_record;
 --
--- UPDATE fb_account_asset SET amt = 10000, forzen_amt = 0
+-- UPDATE fb_account_asset SET volume = 10000, forzen_amt = 0
 -- WHERE coin_id = 2;
--- UPDATE fb_account_asset SET amt = 100, forzen_amt = 0
+-- UPDATE fb_account_asset SET volume = 100, forzen_amt = 0
 -- WHERE coin_id = 1;
 
 
@@ -1057,7 +1057,7 @@ CREATE TABLE IF NOT EXISTS `fb_account_asset` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `account_uid` char(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
   `coin_id` int(11) NOT NULL DEFAULT '0',
-  `amt` decimal(20,8) NOT NULL DEFAULT '0.00000000',
+  `volume` decimal(20,8) NOT NULL DEFAULT '0.00000000',
   `forzen_amt` decimal(20,8) NOT NULL DEFAULT '0.00000000',
   `create_time` bigint(20) NOT NULL DEFAULT '0',
   `update_time` bigint(20) NOT NULL DEFAULT '0',
@@ -1068,7 +1068,7 @@ CREATE TABLE IF NOT EXISTS `fb_account_asset` (
 -- 正在导出表  nb.fb_account_asset 的数据：~2,004 rows (大约)
 DELETE FROM `fb_account_asset`;
 /*!40000 ALTER TABLE `fb_account_asset` DISABLE KEYS */;
-INSERT INTO `fb_account_asset` (`id`, `account_uid`, `coin_id`, `amt`, `forzen_amt`, `create_time`, `update_time`) VALUES
+INSERT INTO `fb_account_asset` (`id`, `account_uid`, `coin_id`, `volume`, `forzen_amt`, `create_time`, `update_time`) VALUES
 	(1, '1b855c98f2b341ae8c1b29728ffc64ab', 1, 100.00000000, 0.00000000, 1555399210837, 1555399210837),
 	(2, '1b855c98f2b341ae8c1b29728ffc64ab', 2, 10000.00000000, 0.00000000, 1555399210837, 1555399210837),
 	(3, '4bf34b3546ed49389e7c732bfe23cb79', 1, 100.00000000, 0.00000000, 1555399369542, 1555399369542),

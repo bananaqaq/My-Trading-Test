@@ -33,7 +33,7 @@
     <!--<import resource="spring-task.xml"/>-->
     <import resource="spring-mysql.xml"/>
     <import resource="spring-redis.xml"/>
-    <import resource="spring-abq.xml"/>
+<!--    <import resource="spring-abq.xml"/>-->
     <!--<import resource="spring-rabbit.xml"/>-->
 
 </beans>

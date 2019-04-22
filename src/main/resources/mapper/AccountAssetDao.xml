@@ -25,10 +25,10 @@
   </delete>
   <insert id="insert" parameterType="newbbb.model.AccountAsset">
     insert into fb_account_asset (id, account_uid, coin_id, 
-      amt, forzen_amt, create_time, 
+      amt, forzen_amt, create_time,
       update_time)
     values (#{id,jdbcType=INTEGER}, #{accountUid,jdbcType=CHAR}, #{coinId,jdbcType=INTEGER}, 
-      #{amt,jdbcType=DECIMAL}, #{forzenAmt,jdbcType=DECIMAL}, #{createTime,jdbcType=BIGINT}, 
+      #{amt,jdbcType=DECIMAL}, #{forzenAmt,jdbcType=DECIMAL}, #{createTime,jdbcType=BIGINT},
       #{updateTime,jdbcType=BIGINT})
   </insert>
   <insert id="insertSelective" parameterType="newbbb.model.AccountAsset">

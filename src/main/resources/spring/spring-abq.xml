@@ -5,8 +5,8 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <!--资产更新队列-->
-    <bean id="assetUpdateAbq" class="java.util.concurrent.ArrayBlockingQueue">
-
-    </bean>
+<!--    <bean id="assetUpdateAbq" class="java.util.concurrent.ArrayBlockingQueue">-->
+<!--        -->
+<!--    </bean>-->
 
 </beans>

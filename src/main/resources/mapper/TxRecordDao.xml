@@ -27,11 +27,11 @@
   </delete>
   <insert id="insert" parameterType="newbbb.model.TxRecord">
     insert into fb_tx_record (id, uid, buyer_uid, 
-      seller_uid, deal_price, volume, 
+      seller_uid, deal_price, volume,
       tx_fee, create_time, update_time
       )
     values (#{id,jdbcType=INTEGER}, #{uid,jdbcType=CHAR}, #{buyerUid,jdbcType=CHAR}, 
-      #{sellerUid,jdbcType=CHAR}, #{dealPrice,jdbcType=DECIMAL}, #{volume,jdbcType=DECIMAL}, 
+      #{sellerUid,jdbcType=CHAR}, #{dealPrice,jdbcType=DECIMAL}, #{volume,jdbcType=DECIMAL},
       #{txFee,jdbcType=DECIMAL}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}
       )
   </insert>
