@@ -9,6 +9,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 @Component
 public class AssetUpdateAbq implements Runnable {
 
+    private final int SLEEP_TIME = 500;
+
     @Autowired
     private IAccountAssetService aaService;
 
@@ -29,7 +31,7 @@ public class AssetUpdateAbq implements Runnable {
         while (true) {
             if (abq.size() == 0) {
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(SLEEP_TIME);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -45,7 +47,7 @@ public class AssetUpdateAbq implements Runnable {
                     default:
                         break;
                 }
-                System.out.println((i++) + ":处理完成\t" + abq.size());
+                System.out.println("资产更新：\t" + (i++) + ":处理完成\t" + abq.size());
             }
         }
     }

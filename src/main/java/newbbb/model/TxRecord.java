@@ -92,4 +92,19 @@ public class TxRecord {
     public void setUpdateTime(Long updateTime) {
         this.updateTime = updateTime;
     }
+
+    @Override
+    public String toString() {
+        return "TxRecord{" +
+                "id=" + id +
+                ", uid='" + uid + '\'' +
+                ", buyerUid='" + buyerUid + '\'' +
+                ", sellerUid='" + sellerUid + '\'' +
+                ", dealPrice=" + dealPrice +
+                ", volume=" + volume +
+                ", txFee=" + txFee +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
+    }
 }

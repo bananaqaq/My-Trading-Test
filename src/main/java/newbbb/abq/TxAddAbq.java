@@ -11,7 +11,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 @Component
 public class TxAddAbq implements Runnable {
 
-    private final int ADD_SIZE = 20;
+    private final int MAX_SIZE = 25;
+    private final int SLEEP_TIME = 500;
+    private final int MAX_WAIT_TIME = 6000;
 
     @Autowired
     private ITxRecordService trService;
@@ -32,17 +34,18 @@ public class TxAddAbq implements Runnable {
     public void run() {
         try {
             while (true) {
+                long timeNow = new Date().getTime();
                 if (abq.size() == 0) {
-                    Thread.sleep(500);
-                } else if (abq.size() >= ADD_SIZE) {
+                    Thread.sleep(SLEEP_TIME);
+                } else if (abq.size() >= MAX_SIZE) {
                     handleTxAdd();
-                } else {
-                    long timeNow = new Date().getTime();
-                    if (timeNow - lastCallTime >= 1500) {
-                        handleTxAdd();
-                    }
                     lastCallTime = timeNow;
-                    Thread.sleep(500);
+                } else {
+                    if (timeNow - lastCallTime >= MAX_WAIT_TIME) {
+                        handleTxAdd();
+                        lastCallTime = timeNow;
+                    }
+                    Thread.sleep(SLEEP_TIME);
                 }
             }
         } catch (InterruptedException e) {
@@ -52,13 +55,14 @@ public class TxAddAbq implements Runnable {
 
     private void handleTxAdd() {
         ArrayList<TxRecord> taiList = new ArrayList<>();
-        for (int i = 0; i < ADD_SIZE; i++) {
-            if(abq.size() == 0){
+        for (int i = 0; i < MAX_SIZE; i++) {
+            if (abq.size() == 0) {
                 break;
             }
             taiList.add(abq.remove());
+            System.out.println("交易记录添加：\t" + i + "\t" + taiList.get(i).toString());
         }
-        if(taiList.size() != 0){
+        if (taiList.size() != 0) {
             trService.addList(taiList);
         }
     }

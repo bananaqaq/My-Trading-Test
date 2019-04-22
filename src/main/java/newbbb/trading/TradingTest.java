@@ -52,7 +52,7 @@ public class TradingTest{
         Thread taThread = new Thread(taAbq);
 
         auThread.start();
-//        taThread.start();
+        taThread.start();
     }
 
     // requestOrder需携带参数 1：txPairId     2：accountUid    3：price     4：volume
@@ -100,22 +100,12 @@ public class TradingTest{
         long midTime = new Date().getTime();
         Iterator<SellOrder> soIterator = soList.iterator();
 
-
         AssetUpdateInfo aui1 = new AssetUpdateInfo(requestOrder.getAccountUid(), aCoinId, BigDecimal.ZERO, AssetUpdateEnum.SUB, AssetTypeEnum.FORZEN);
         AssetUpdateInfo aui2 = new AssetUpdateInfo(requestOrder.getAccountUid(), aCoinId, BigDecimal.ZERO, AssetUpdateEnum.ADD, AssetTypeEnum.NORMAL);
         AssetUpdateInfo aui3 = new AssetUpdateInfo(requestOrder.getAccountUid(), fCoinId, BigDecimal.ZERO, AssetUpdateEnum.ADD, AssetTypeEnum.NORMAL);
 
-        if (soIterator.hasNext()) {
-            while (true) {
-                if (!soIterator.hasNext()) {
-                    limitNum = limitNum << (flag <= maxFlag ? 1 : 0);
-                    flag++;
-                    soList = soService.getUncompletedList(tp.getId(), limitNum);
-                    soIterator = soList.iterator();
-                    if (!soIterator.hasNext()) {
-                        break;
-                    }
-                }
+//        if (soIterator.hasNext()) {
+            while (soIterator.hasNext()) {
 
                 SellOrder so = soIterator.next();
                 BigDecimal rPrice = requestOrder.getPrice();
@@ -162,13 +152,20 @@ public class TradingTest{
                 txRecord.setTxFee(BigDecimal.ZERO);
                 txRecord.setCreateTime(timeNow);
                 txRecord.setUpdateTime(timeNow);
-                trService.add(txRecord);
+                taAbq.put(txRecord);
+//                trService.add(txRecord);
 
                 if (rVolume.compareTo(sVolume) < 0) {
                     break;
                 }
+                if (soIterator.hasNext()) {
+                    limitNum = limitNum << (flag <= maxFlag ? 1 : 0);
+                    flag++;
+                    soList = soService.getUncompletedList(tp.getId(), limitNum);
+                    soIterator = soList.iterator();
+                }
             }
-        }
+//        }
         long endTime = new Date().getTime();
         BigDecimal totalTxVolume = requestOrder.getInitialVolume().subtract(requestOrder.getVolume());
         if (totalTxVolume.compareTo(BigDecimal.ZERO) > 0) {
@@ -214,17 +211,8 @@ public class TradingTest{
         AssetUpdateInfo aui1 = new AssetUpdateInfo(requestOrder.getAccountUid(), fCoinId, BigDecimal.ZERO, AssetUpdateEnum.SUB, AssetTypeEnum.FORZEN);
         AssetUpdateInfo aui2 = new AssetUpdateInfo(requestOrder.getAccountUid(), aCoinId, BigDecimal.ZERO, AssetUpdateEnum.ADD, AssetTypeEnum.NORMAL);
 
-        if (boIterator.hasNext()) {
-            while (true) {
-                if (!boIterator.hasNext()) {
-                    limitNum = limitNum << (flag <= maxFlag ? 1 : 0);
-                    flag++;
-                    boList = boService.getUncompletedList(tp.getId(), limitNum);
-                    boIterator = boList.iterator();
-                    if (!boIterator.hasNext()) {
-                        break;
-                    }
-                }
+//        if (boIterator.hasNext()) {
+            while (boIterator.hasNext()) {
 
                 BuyOrder bo = boIterator.next();
                 BigDecimal rPrice = requestOrder.getPrice();
@@ -268,13 +256,20 @@ public class TradingTest{
                 txRecord.setTxFee(BigDecimal.ZERO);
                 txRecord.setCreateTime(timeNow);
                 txRecord.setUpdateTime(timeNow);
-                trService.add(txRecord);
+                taAbq.put(txRecord);
+//                trService.add(txRecord);
 
                 if (rVolume.compareTo(bVolume) < 0) {
                     break;
                 }
+                if (!boIterator.hasNext()) {
+                    limitNum = limitNum << (flag <= maxFlag ? 1 : 0);
+                    flag++;
+                    boList = boService.getUncompletedList(tp.getId(), limitNum);
+                    boIterator = boList.iterator();
+                }
             }
-        }
+//        }
         long endTime = new Date().getTime();
         BigDecimal totalTxVolume = requestOrder.getInitialVolume().subtract(requestOrder.getVolume());
         if (totalTxVolume.compareTo(BigDecimal.ZERO) > 0) {

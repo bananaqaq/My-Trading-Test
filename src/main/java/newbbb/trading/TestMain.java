@@ -6,8 +6,6 @@ import newbbb.model.*;
 import newbbb.service.*;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import sun.security.jca.GetInstance;
-
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -130,7 +128,7 @@ public class TestMain {
 
 
         TxPair tp = NBGlobalConfig.TX_PAIRS[2];
-        int userNum = 30;
+        int userNum = 40;
         int tradingNum = 8;
         int fAmtMax = 100;
         int aAmtMax = 10000;

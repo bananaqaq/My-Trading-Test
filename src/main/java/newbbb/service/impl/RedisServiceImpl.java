@@ -5,6 +5,7 @@ import newbbb.service.IRedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
@@ -77,5 +78,11 @@ public class RedisServiceImpl implements IRedisService {
 	@Override
 	public String pop(String key) {
 		return (String) this.redisString.opsForList().rightPop(key);
+	}
+
+	public void zset(String key, double score, String value){
+		ZSetOperations<String, String> ops = this.redisString.opsForZSet();
+		ops.rangeWithScores("", 0, -1);
+
 	}
 }
