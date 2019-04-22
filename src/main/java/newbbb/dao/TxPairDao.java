@@ -23,4 +23,6 @@ public interface TxPairDao {
 
 
     List<TxPair> selectAll();
+
+
 }

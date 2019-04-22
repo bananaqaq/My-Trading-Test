@@ -2,6 +2,8 @@ package newbbb.dao;
 
 import newbbb.model.TxRecord;
 
+import java.util.List;
+
 public interface TxRecordDao {
     int deleteByPrimaryKey(Integer id);
 
@@ -14,4 +16,8 @@ public interface TxRecordDao {
     int updateByPrimaryKeySelective(TxRecord record);
 
     int updateByPrimaryKey(TxRecord record);
+
+
+
+    int insertList(List<TxRecord> list);
 }

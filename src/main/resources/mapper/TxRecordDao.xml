@@ -138,4 +138,21 @@
       update_time = #{updateTime,jdbcType=BIGINT}
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+
+
+  <insert id="insertList" parameterType="list">
+    insert into fb_tx_record (uid, buyer_uid,
+      seller_uid, deal_price, volume,
+      tx_fee, create_time, update_time
+      )
+    values
+    <foreach item="item" collection="list" separator="," open="" close="" index="">
+      (#{uid,jdbcType=CHAR}, #{buyerUid,jdbcType=CHAR},
+      #{sellerUid,jdbcType=CHAR}, #{dealPrice,jdbcType=DECIMAL}, #{volume,jdbcType=DECIMAL},
+      #{txFee,jdbcType=DECIMAL}, #{createTime,jdbcType=BIGINT}, #{updateTime,jdbcType=BIGINT}
+      )
+    </foreach>
+  </insert>
+
 </mapper>

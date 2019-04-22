@@ -6,8 +6,8 @@ import newbbb.service.ITxRecordService;
 import newbbb.util.UUIdUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 
 @Service
@@ -30,5 +30,11 @@ public class TxRecordServiceImpl implements ITxRecordService {
             }
         }
         return null;
+    }
+
+    @Override
+    public int addList(ArrayList<TxRecord> trList) {
+
+        return trDao.insertList(trList);
     }
 }
