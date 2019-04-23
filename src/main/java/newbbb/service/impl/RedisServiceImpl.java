@@ -3,12 +3,15 @@ package newbbb.service.impl;
 
 import newbbb.service.IRedisService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
+import javax.annotation.PostConstruct;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -16,6 +19,17 @@ public class RedisServiceImpl implements IRedisService {
 
 	@Autowired
 	private RedisTemplate redisString;
+
+	private ZSetOperations<String, String> opsForZSet;
+
+	private HashOperations<String, String, String> opsForHash;
+
+	@PostConstruct
+	private void initOps(){
+		opsForZSet = redisString.opsForZSet();
+		opsForHash = redisString.opsForHash();
+	}
+
 
 	@Override
 	public String getKey(String key) {
@@ -56,21 +70,6 @@ public class RedisServiceImpl implements IRedisService {
 	}
 
 	@Override
-	public void setHashKey(String key, String field, String value) {
-		this.redisString.opsForHash().put(key, field, value);
-	}
-
-	@Override
-	public String getHashKey(String key, String field) {
-		return (String) this.redisString.opsForHash().get(key, field);
-	}
-
-	@Override
-	public List<Map<String, String>> getHashKeys(String key) {
-		return this.redisString.opsForHash().values(key);
-	}
-
-	@Override
 	public void push(String key, String val) {
 		this.redisString.opsForList().leftPush(key, val);
 	}
@@ -80,9 +79,43 @@ public class RedisServiceImpl implements IRedisService {
 		return (String) this.redisString.opsForList().rightPop(key);
 	}
 
-	public void zset(String key, double score, String value){
-		ZSetOperations<String, String> ops = this.redisString.opsForZSet();
-		ops.rangeWithScores("", 0, -1);
 
+
+	// hash
+	@Override
+	public void hSet(String key, String field, String value){
+		opsForHash.put(key, field, value);
 	}
+
+	@Override
+	public void hRemove(String key, String field){
+		opsForHash.delete(key, field);
+	}
+
+	@Override
+	public String hGet(String key, String field){
+		return opsForHash.get(key, field);
+	}
+
+	@Override
+	public List<String> hMultiGet(String key, Collection<String> fields){
+		return opsForHash.multiGet(key, fields);
+	}
+
+	// zset
+	@Override
+	public void zAdd(String key, String value, double score){
+		opsForZSet.add(key, value, score);
+	}
+
+	@Override
+	public void zRemove(String key, String value){
+		opsForZSet.remove(key, value);
+	}
+
+	@Override
+	public Set<String> zRange(String key, long count){
+		return opsForZSet.rangeByScore(key, Long.MIN_VALUE, Long.MAX_VALUE, 0, count);
+	}
+
 }

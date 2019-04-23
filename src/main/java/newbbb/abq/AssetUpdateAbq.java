@@ -10,11 +10,12 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class AssetUpdateAbq implements Runnable {
 
     private final int SLEEP_TIME = 500;
+    private final int ABQ_SIZE = 100;
 
     @Autowired
     private IAccountAssetService aaService;
 
-    private final ArrayBlockingQueue<AssetUpdateInfo> abq = new ArrayBlockingQueue<>(100);
+    private final ArrayBlockingQueue<AssetUpdateInfo> abq = new ArrayBlockingQueue<>(ABQ_SIZE);
 
     public void put(AssetUpdateInfo aui) {
         try {
@@ -23,8 +24,6 @@ public class AssetUpdateAbq implements Runnable {
             e.printStackTrace();
         }
     }
-
-    int i = 1;
 
     @Override
     public void run() {
@@ -47,7 +46,7 @@ public class AssetUpdateAbq implements Runnable {
                     default:
                         break;
                 }
-                System.out.println("资产更新：\t" + (i++) + ":处理完成\t" + abq.size());
+                System.out.println("资产更新：\t" + ":处理完成\t" + abq.size());
             }
         }
     }

@@ -14,13 +14,14 @@ public class TxAddAbq implements Runnable {
     private final int MAX_SIZE = 25;
     private final int SLEEP_TIME = 500;
     private final int MAX_WAIT_TIME = 6000;
+    private final int ABQ_SIZE = 100;
 
     @Autowired
     private ITxRecordService trService;
 
     private long lastCallTime = new Date().getTime();
 
-    public final static ArrayBlockingQueue<TxRecord> abq = new ArrayBlockingQueue<>(100);
+    public final ArrayBlockingQueue<TxRecord> abq = new ArrayBlockingQueue<>(ABQ_SIZE);
 
     public void put(TxRecord tr) {
         try {

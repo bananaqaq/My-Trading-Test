@@ -1,23 +1,24 @@
 package newbbb.trading;
 
+import com.alibaba.fastjson.JSON;
 import newbbb.abq.AssetUpdateAbq;
 import newbbb.abq.TxAddAbq;
 import newbbb.abq.model.AssetUpdateInfo;
 import newbbb.constant.NBGlobalConfig;
 import newbbb.enums.AssetTypeEnum;
 import newbbb.enums.AssetUpdateEnum;
+import newbbb.enums.OrderTypeEnum;
 import newbbb.enums.TxDirectionEnum;
 import newbbb.model.*;
 import newbbb.service.*;
 import newbbb.util.UUIdUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+
+import static newbbb.constant.NBGlobalConfig.*;
 
 @Component("tradingTest")
 public class TradingTest{
@@ -282,6 +283,69 @@ public class TradingTest{
         System.out.println("\tsearch:" + (midTime - startTime));
         System.out.println("\tdeal:" + (endTime - midTime));
         return 1;
+    }
+
+    private List<Order> getUncompletedList(OrderTypeEnum orderTypeEnum, int txPairId, long count){
+        String[] keyArr = getKey(orderTypeEnum, txPairId);
+        String marketKey = keyArr[0];
+        String marketDetailKey = keyArr[1];
+
+        Set<String> sortedUidSet = redisService.zRange(marketKey, count);
+        if(sortedUidSet.size() == 0){
+            return null;
+        }
+        List<String> orderJsonList = redisService.hMultiGet(marketDetailKey, sortedUidSet);
+        if(orderJsonList.size() == 0){
+            return null;
+        }
+        List<Order> orderList = new ArrayList<>();
+        for(String orderJson : orderJsonList){
+            orderList.add(JSON.parseObject(orderJson, Order.class));
+        }
+
+        return orderList;
+    }
+
+    private void addOrder(OrderTypeEnum orderTypeEnum, int txPairId, Order order){
+        double score = 0;
+        String[] keyArr = getKey(orderTypeEnum, txPairId);
+        String marketKey = keyArr[0];
+        String marketDetailKey = keyArr[1];
+
+        // 生成score
+        double price = order.getPrice().doubleValue();
+        long createIndex = redisService.incr(MARKET_CREATE_INDEX_KEY);
+
+        String jsonStr = JSON.toJSONString(order);
+        redisService.zAdd(marketKey, order.getUid(), score);
+        redisService.hSet(marketDetailKey, order.getUid(), jsonStr);
+    }
+
+    private void removeOrder(OrderTypeEnum orderTypeEnum, int txPairId, String uid){
+
+    }
+
+    private void subVolume(OrderTypeEnum orderTypeEnum, int txPairId, String uid, BigDecimal volume){
+
+    }
+
+    private String[] getKey(OrderTypeEnum orderTypeEnum, int txPairId){
+        String[] keyArr = new String[2];
+        keyArr[0] = txPairId + "";
+        keyArr[1] = txPairId + "";
+        switch(orderTypeEnum){
+            case BUY:
+                keyArr[0] += MARKET_BUY_SUFFIX;
+                keyArr[1] += MARKET_BUY_DETAIL_SUFFIX;
+                break;
+            case SELL:
+                keyArr[0] += MARKET_SELL_SUFFIX;
+                keyArr[1] += MARKET_SELL_DETAIL_SUFFIX;
+                break;
+            default:
+                break;
+        }
+        return keyArr;
     }
 
 }

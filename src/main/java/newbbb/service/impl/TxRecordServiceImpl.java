@@ -34,7 +34,9 @@ public class TxRecordServiceImpl implements ITxRecordService {
 
     @Override
     public int addList(ArrayList<TxRecord> trList) {
-
-        return trDao.insertList(trList);
+        if (trList != null && trList.size() != 0) {
+            return trDao.insertList(trList);
+        }
+        return 0;
     }
 }

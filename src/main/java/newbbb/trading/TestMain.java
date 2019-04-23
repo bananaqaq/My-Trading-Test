@@ -6,6 +6,8 @@ import newbbb.model.*;
 import newbbb.service.*;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.data.redis.core.ZSetOperations;
+
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -126,6 +128,19 @@ public class TestMain {
             }
         }*/
 
+
+//        redisService.zAdd("ztest", "a", 4);
+//        redisService.zAdd("ztest", "b", 5);
+//        redisService.zAdd("ztest", "c", 3);
+//        redisService.zAdd("ztest", "d", 2);
+//        redisService.zAdd("ztest", "e", 1);
+//
+//        Set<ZSetOperations.TypedTuple<String>> set =redisService.zRange("ztest", 2);
+//        Iterator<ZSetOperations.TypedTuple<String>> iterator = set.iterator();
+//        while (iterator.hasNext()) {
+//            ZSetOperations.TypedTuple<String> item = iterator.next();
+//            System.out.println(item.getValue() + "   " + item.getScore());
+//        }
 
         TxPair tp = NBGlobalConfig.TX_PAIRS[2];
         int userNum = 40;
