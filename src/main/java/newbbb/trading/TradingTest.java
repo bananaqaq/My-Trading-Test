@@ -98,9 +98,10 @@ public class TradingTest{
         int limitNum = 1;
 
         long startTime = new Date().getTime();
-        List<SellOrder> soList = soService.getUncompletedList(tp.getId(), limitNum);
+//        List<SellOrder> soList = soService.getUncompletedList(tp.getId(), limitNum);
+        List<Order> soList = getUncompletedList(OrderTypeEnum.BUY, tp.getId(), limitNum);
         long midTime = new Date().getTime();
-        Iterator<SellOrder> soIterator = soList.iterator();
+        Iterator<Order> soIterator = soList.iterator();
 
         AssetUpdateInfo aui1 = new AssetUpdateInfo(requestOrder.getAccountUid(), aCoinId, BigDecimal.ZERO, AssetUpdateEnum.SUB, AssetTypeEnum.FORZEN);
         AssetUpdateInfo aui2 = new AssetUpdateInfo(requestOrder.getAccountUid(), aCoinId, BigDecimal.ZERO, AssetUpdateEnum.ADD, AssetTypeEnum.NORMAL);
@@ -109,7 +110,7 @@ public class TradingTest{
 //        if (soIterator.hasNext()) {
             while (soIterator.hasNext()) {
 
-                SellOrder so = soIterator.next();
+                Order so = soIterator.next();
                 BigDecimal rPrice = requestOrder.getPrice();
                 BigDecimal rVolume = requestOrder.getVolume();
                 BigDecimal sPrice = so.getPrice();
@@ -160,13 +161,13 @@ public class TradingTest{
                 taAbq.put(txRecord);
 //                trService.add(txRecord);
 
-                if (rVolume.compareTo(sVolume) < 0) {
+                if (rVolume.compareTo(sVolume) <= 0) {
                     break;
                 }
                 if (soIterator.hasNext()) {
                     limitNum = limitNum << (flag <= maxFlag ? 1 : 0);
                     flag++;
-                    soList = soService.getUncompletedList(tp.getId(), limitNum);
+                    soList = getUncompletedList(OrderTypeEnum.BUY, tp.getId(), limitNum);
                     soIterator = soList.iterator();
                 }
             }
@@ -201,6 +202,7 @@ public class TradingTest{
 
         // 添加订单记录
         soService.add((SellOrder) requestOrder);
+        addOrder(OrderTypeEnum.SELL, tp.getId(), requestOrder);
 
         // 交易匹配
         int flag = 1;
@@ -266,7 +268,7 @@ public class TradingTest{
                 taAbq.put(txRecord);
 //                trService.add(txRecord);
 
-                if (rVolume.compareTo(bVolume) < 0) {
+                if (rVolume.compareTo(bVolume) <= 0) {
                     break;
                 }
                 if (!boIterator.hasNext()) {
@@ -313,7 +315,7 @@ public class TradingTest{
     }
 
     private void addOrder(OrderTypeEnum orderTypeEnum, int txPairId, Order order){
-        double score = order.getPrice().doubleValue();
+        double score = orderTypeEnum == OrderTypeEnum.BUY? order.getPrice().doubleValue() : order.getPrice().doubleValue() * -1;
         String[] keyArr = getKey(orderTypeEnum, txPairId);
         String marketKey = keyArr[0];
         String marketDetailKey = keyArr[1];
@@ -328,7 +330,8 @@ public class TradingTest{
         String marketKey = keyArr[0];
         String marketDetailKey = keyArr[1];
 
-        redisService.hRemove(marketKey, uid);
+        redisService.zRemove(marketKey, uid);
+        redisService.hRemove(marketDetailKey, uid);
     }
 
     private void subVolume(OrderTypeEnum orderTypeEnum, int txPairId, String uid, Order order){

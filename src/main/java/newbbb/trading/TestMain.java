@@ -166,17 +166,17 @@ public class TestMain {
             BigDecimal fAmtTotal = new BigDecimal(fAmtMax);
             BigDecimal aAmtTotal = new BigDecimal(aAmtMax);
 
-            for (int j = 0; j < tradingNum / 2; j++) {
-                double price = priceMin + random.nextInt(priceBound * 10) / 10.0;
-                double volume = volumeMin + random.nextInt(volumeBound * 10) / 10.0;
-                aAmtTotal = aAmtTotal.subtract(new BigDecimal(price * volume));
-                if(aAmtTotal.compareTo(BigDecimal.ZERO) < 0){
-                    break;
-                }
-                System.out.println("B\t" + volume + "\t\t\t" + price + "\t\t\t");
-                BuyOrder bo = new BuyOrder(tp.getId(), accountUid, price + "", volume + "");
-                oList.add(new TradeInfo(bo, TxDirectionEnum.BUY));
-            }
+//            for (int j = 0; j < tradingNum / 2; j++) {
+//                double price = priceMin + random.nextInt(priceBound * 10) / 10.0;
+//                double volume = volumeMin + random.nextInt(volumeBound * 10) / 10.0;
+//                aAmtTotal = aAmtTotal.subtract(new BigDecimal(price * volume));
+//                if(aAmtTotal.compareTo(BigDecimal.ZERO) < 0){
+//                    break;
+//                }
+//                System.out.println("B\t" + volume + "\t\t\t" + price + "\t\t\t");
+//                BuyOrder bo = new BuyOrder(tp.getId(), accountUid, price + "", volume + "");
+//                oList.add(new TradeInfo(bo, TxDirectionEnum.BUY));
+//            }
             for (int j = 0; j < tradingNum / 2; j++) {
                 double price = priceMin + random.nextInt(priceBound * 10) / 10.0;
                 double volume = volumeMin + random.nextInt(volumeBound * 10) / 10.0;

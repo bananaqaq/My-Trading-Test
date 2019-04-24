@@ -3,6 +3,7 @@ package newbbb.service.impl;
 import io.netty.util.internal.StringUtil;
 import newbbb.dao.SellOrderDao;
 import newbbb.enums.OrderStatusEnum;
+import newbbb.enums.OrderTypeEnum;
 import newbbb.model.SellOrder;
 import newbbb.service.ISellOrderService;
 import newbbb.util.UUIdUtil;
@@ -21,17 +22,18 @@ public class SellOrderServiceImpl implements ISellOrderService {
     private SellOrderDao soDao;
 
     @Override
-    public int add(SellOrder so) {
+    public SellOrder add(SellOrder so) {
         if(soDao!=null){
             long timeNow = new Date().getTime();
-            so.setUid(UUIdUtil.getUUID());
+            so.setUid(UUIdUtil.getOrderUUID(timeNow, OrderTypeEnum.SELL));
             so.setStatus(OrderStatusEnum.NO_DEAL.value());
             so.setInitialVolume(so.getVolume());
             so.setCreateTime(timeNow);
             so.setUpdateTime(timeNow);
-            return soDao.insertSelective(so);
+            soDao.insertSelective(so);
+            return so;
         }
-        return 0;
+        return null;
     }
 
     @Override
