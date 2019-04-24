@@ -14,6 +14,4 @@ public class NBGlobalConfig {
     public final static String MARKET_BUY_DETAIL_SUFFIX = "_MARKET_DETAIL_BUY";
     public final static String MARKET_SELL_DETAIL_SUFFIX = "_MARKET_DETAIL_SELL";
 
-    public final static String MARKET_CREATE_INDEX_KEY = "MARKET_CREATE_INDEX";
-
 }

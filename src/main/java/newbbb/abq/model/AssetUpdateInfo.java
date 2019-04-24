@@ -76,4 +76,9 @@ public class AssetUpdateInfo {
                 ", assetTypeEnum=" + assetTypeEnum +
                 '}';
     }
+
+
+    public void addVolume(BigDecimal volume){
+        this.volume.add(volume);
+    }
 }

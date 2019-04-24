@@ -89,7 +89,8 @@ public class TradingTest{
         }
 
         // 添加订单记录
-        boService.add((BuyOrder) requestOrder);
+        requestOrder = boService.add((BuyOrder) requestOrder);
+        addOrder(OrderTypeEnum.BUY, tp.getId(), requestOrder);
 
         // 交易匹配
         int flag = 0;
@@ -132,9 +133,12 @@ public class TradingTest{
 //                aaService.updateForzenAmt(requestOrder.getAccountUid(), aCoinId, txVolume.multiply(rPrice), AssetUpdateEnum.SUB);
 //                aaService.updateAmt(requestOrder.getAccountUid(), aCoinId, txVolume.multiply(rPrice.subtract(sPrice)), AssetUpdateEnum.ADD);
 //                aaService.updateAmt(requestOrder.getAccountUid(), fCoinId, txVolume, AssetUpdateEnum.ADD);
-                aui1.setVolume(aui1.getVolume().add(txVolume.multiply(rPrice)));
-                aui2.setVolume(aui2.getVolume().add(txVolume.multiply(rPrice.subtract(sPrice))));
-                aui3.setVolume(aui3.getVolume().add(txVolume));
+//                aui1.setVolume(aui1.getVolume().add(txVolume.multiply(rPrice)));
+//                aui2.setVolume(aui2.getVolume().add(txVolume.multiply(rPrice.subtract(sPrice))));
+//                aui3.setVolume(aui3.getVolume().add(txVolume));
+                aui1.addVolume(txVolume.multiply(rPrice));
+                aui2.addVolume(txVolume.multiply(rPrice.subtract(sPrice)));
+                aui3.addVolume(txVolume);
 
 //                aaService.updateForzenAmt(so.getAccountUid(), fCoinId, txVolume, AssetUpdateEnum.SUB);
 //                aaService.updateAmt(so.getAccountUid(), aCoinId, txTotalPrice, AssetUpdateEnum.ADD);
@@ -237,8 +241,10 @@ public class TradingTest{
                 // 更新用户资产
 //                aaService.updateForzenAmt(requestOrder.getAccountUid(), fCoinId, txVolume, AssetUpdateEnum.SUB);
 //                aaService.updateAmt(requestOrder.getAccountUid(), aCoinId, txTotalPrice, AssetUpdateEnum.ADD);
-                aui1.setVolume(aui1.getVolume().add(txVolume));
-                aui2.setVolume(aui2.getVolume().add(txTotalPrice));
+//                aui1.setVolume(aui1.getVolume().add(txVolume));
+//                aui2.setVolume(aui2.getVolume().add(txTotalPrice));
+                aui1.addVolume(txVolume);
+                aui2.addVolume(txTotalPrice);
 
 //                aaService.updateForzenAmt(bo.getAccountUid(), aCoinId, txTotalPrice, AssetUpdateEnum.SUB);
 //                aaService.updateAmt(bo.getAccountUid(), fCoinId, txVolume, AssetUpdateEnum.ADD);
@@ -307,14 +313,10 @@ public class TradingTest{
     }
 
     private void addOrder(OrderTypeEnum orderTypeEnum, int txPairId, Order order){
-        double score = 0;
+        double score = order.getPrice().doubleValue();
         String[] keyArr = getKey(orderTypeEnum, txPairId);
         String marketKey = keyArr[0];
         String marketDetailKey = keyArr[1];
-
-        // 生成score
-        double price = order.getPrice().doubleValue();
-        long createIndex = redisService.incr(MARKET_CREATE_INDEX_KEY);
 
         String jsonStr = JSON.toJSONString(order);
         redisService.zAdd(marketKey, order.getUid(), score);
@@ -322,11 +324,20 @@ public class TradingTest{
     }
 
     private void removeOrder(OrderTypeEnum orderTypeEnum, int txPairId, String uid){
+        String[] keyArr = getKey(orderTypeEnum, txPairId);
+        String marketKey = keyArr[0];
+        String marketDetailKey = keyArr[1];
 
+        redisService.hRemove(marketKey, uid);
     }
 
-    private void subVolume(OrderTypeEnum orderTypeEnum, int txPairId, String uid, BigDecimal volume){
+    private void subVolume(OrderTypeEnum orderTypeEnum, int txPairId, String uid, Order order){
+        String[] keyArr = getKey(orderTypeEnum, txPairId);
+        String marketKey = keyArr[0];
+        String marketDetailKey = keyArr[1];
+        String jsonStr = JSON.toJSONString(order);
 
+        redisService.hSet(marketDetailKey, uid, jsonStr);
     }
 
     private String[] getKey(OrderTypeEnum orderTypeEnum, int txPairId){

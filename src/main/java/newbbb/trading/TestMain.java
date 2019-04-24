@@ -84,9 +84,9 @@ public class TestMain {
         TradingTest instance = context.getBean(TradingTest.class);
         /*String accountUid = "1b855c98f2b341ae8c1b29728ffc64ab";
         String testAccountUid = "4bf34b3546ed49389e7c732bfe23cb79";
-        int txPairId = 2;
+        int txPairId = 2;*/
 
-        SellOrder s1 = new SellOrder(txPairId, accountUid, "15", "2");
+        /*SellOrder s1 = new SellOrder(txPairId, accountUid, "15", "2");
         SellOrder s2 = new SellOrder(txPairId, accountUid, "14", "2");
         SellOrder s3 = new SellOrder(txPairId, accountUid, "13", "2");
         SellOrder s4 = new SellOrder(txPairId, accountUid, "12", "2");
@@ -107,10 +107,10 @@ public class TestMain {
         int br2 = instance.makeTrade(b2, TxDirectionEnum.BUY);
         int br3 = instance.makeTrade(b3, TxDirectionEnum.BUY);
         int br4 = instance.makeTrade(b4, TxDirectionEnum.BUY);
-        int br5 = instance.makeTrade(b5, TxDirectionEnum.BUY);
+        int br5 = instance.makeTrade(b5, TxDirectionEnum.BUY);*/
 
 
-        for (int i = 0; i < 1000; i++) {
+        /*for (int i = 0; i < 1000; i++) {
             Scanner sc = new Scanner(System.in);
             msgPrint("please enter opt type( b|s )");
             String txDirectionStr = sc.next();
@@ -129,17 +129,16 @@ public class TestMain {
         }*/
 
 
-//        redisService.zAdd("ztest", "a", 4);
-//        redisService.zAdd("ztest", "b", 5);
+//        redisService.zAdd("ztest", "a", 1);
+//        redisService.zAdd("ztest", "b", 2);
 //        redisService.zAdd("ztest", "c", 3);
-//        redisService.zAdd("ztest", "d", 2);
-//        redisService.zAdd("ztest", "e", 1);
-//
-//        Set<ZSetOperations.TypedTuple<String>> set =redisService.zRange("ztest", 2);
-//        Iterator<ZSetOperations.TypedTuple<String>> iterator = set.iterator();
-//        while (iterator.hasNext()) {
-//            ZSetOperations.TypedTuple<String> item = iterator.next();
-//            System.out.println(item.getValue() + "   " + item.getScore());
+//        redisService.zAdd("ztest", "d", 3);
+//        redisService.zAdd("ztest", "e", 4);
+//        redisService.zAdd("ztest", "g", 3);
+
+//        Set<String> set =redisService.zRange("2_MARKET_BUY", 7);
+//        for(String field:set){
+//            System.out.println(field);
 //        }
 
         TxPair tp = NBGlobalConfig.TX_PAIRS[2];

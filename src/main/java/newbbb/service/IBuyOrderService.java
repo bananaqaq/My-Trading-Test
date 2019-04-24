@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface IBuyOrderService {
 
-    int add(BuyOrder bo);
+    BuyOrder add(BuyOrder bo);
 
     int subVolume(String uid, BigDecimal volume);
 
