@@ -2,8 +2,10 @@ package newbbb.trading;
 
 import com.alibaba.fastjson.JSON;
 import newbbb.abq.AssetUpdateAbq;
+import newbbb.abq.OrderVolumeSubAbq;
 import newbbb.abq.TxAddAbq;
 import newbbb.abq.model.AssetUpdateInfo;
+import newbbb.abq.model.OrderVolumeSubInfo;
 import newbbb.constant.NBGlobalConfig;
 import newbbb.enums.AssetTypeEnum;
 import newbbb.enums.AssetUpdateEnum;
@@ -17,11 +19,10 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.*;
-
 import static newbbb.constant.NBGlobalConfig.*;
 
 @Component("tradingTest")
-public class TradingTest{
+public class TradingTest {
 
     @Autowired
     private IRedisService redisService;
@@ -47,13 +48,18 @@ public class TradingTest{
     @Autowired
     private TxAddAbq taAbq;
 
+    @Autowired
+    private OrderVolumeSubAbq ovsAbq;
+
     @PostConstruct
-    private void initAbqHandle(){
+    private void initAbqHandle() {
         Thread auThread = new Thread(auAbq);
         Thread taThread = new Thread(taAbq);
+        Thread ovsThread = new Thread(ovsAbq);
 
         auThread.start();
         taThread.start();
+        ovsThread.start();
     }
 
     // requestOrder需携带参数 1：txPairId     2：accountUid    3：price     4：volume
@@ -98,8 +104,10 @@ public class TradingTest{
         int limitNum = 1;
 
         long startTime = new Date().getTime();
-//        List<SellOrder> soList = soService.getUncompletedList(tp.getId(), limitNum);
-        List<Order> soList = getUncompletedList(OrderTypeEnum.BUY, tp.getId(), limitNum);
+        List<Order> soList = getUncompletedList(OrderTypeEnum.SELL, tp.getId(), limitNum);
+        if (soList == null) {
+            return 1;
+        }
         long midTime = new Date().getTime();
         Iterator<Order> soIterator = soList.iterator();
 
@@ -107,75 +115,76 @@ public class TradingTest{
         AssetUpdateInfo aui2 = new AssetUpdateInfo(requestOrder.getAccountUid(), aCoinId, BigDecimal.ZERO, AssetUpdateEnum.ADD, AssetTypeEnum.NORMAL);
         AssetUpdateInfo aui3 = new AssetUpdateInfo(requestOrder.getAccountUid(), fCoinId, BigDecimal.ZERO, AssetUpdateEnum.ADD, AssetTypeEnum.NORMAL);
 
-//        if (soIterator.hasNext()) {
-            while (soIterator.hasNext()) {
+        while (soIterator.hasNext()) {
 
-                Order so = soIterator.next();
-                BigDecimal rPrice = requestOrder.getPrice();
-                BigDecimal rVolume = requestOrder.getVolume();
-                BigDecimal sPrice = so.getPrice();
-                BigDecimal sVolume = so.getVolume();
-                BigDecimal txPrice = sPrice;
-                BigDecimal txVolume = BigDecimal.ZERO;
-                BigDecimal txTotalPrice = BigDecimal.ZERO;
+            Order so = soIterator.next();
+            BigDecimal rPrice = requestOrder.getPrice();
+            BigDecimal rVolume = requestOrder.getVolume();
+            BigDecimal sPrice = so.getPrice();
+            BigDecimal sVolume = so.getVolume();
+            BigDecimal txPrice = sPrice;
+            BigDecimal txVolume = BigDecimal.ZERO;
+            BigDecimal txTotalPrice = BigDecimal.ZERO;
 
-                if (rPrice.compareTo(sPrice) < 0) {
-                    break;
-                }
-
-                txVolume = rVolume.compareTo(sVolume) < 0 ? rVolume : sVolume;
-                txTotalPrice = txPrice.multiply(txVolume);
-
-                // 更新订单
-                requestOrder.subVolume(txVolume);
-                soService.subVolume(so.getUid(), txVolume);
-
-                // 更新用户资产
-//                aaService.updateForzenAmt(requestOrder.getAccountUid(), aCoinId, txVolume.multiply(rPrice), AssetUpdateEnum.SUB);
-//                aaService.updateAmt(requestOrder.getAccountUid(), aCoinId, txVolume.multiply(rPrice.subtract(sPrice)), AssetUpdateEnum.ADD);
-//                aaService.updateAmt(requestOrder.getAccountUid(), fCoinId, txVolume, AssetUpdateEnum.ADD);
-//                aui1.setVolume(aui1.getVolume().add(txVolume.multiply(rPrice)));
-//                aui2.setVolume(aui2.getVolume().add(txVolume.multiply(rPrice.subtract(sPrice))));
-//                aui3.setVolume(aui3.getVolume().add(txVolume));
-                aui1.addVolume(txVolume.multiply(rPrice));
-                aui2.addVolume(txVolume.multiply(rPrice.subtract(sPrice)));
-                aui3.addVolume(txVolume);
-
-//                aaService.updateForzenAmt(so.getAccountUid(), fCoinId, txVolume, AssetUpdateEnum.SUB);
-//                aaService.updateAmt(so.getAccountUid(), aCoinId, txTotalPrice, AssetUpdateEnum.ADD);
-                AssetUpdateInfo aui4 = new AssetUpdateInfo(so.getAccountUid(), fCoinId, txVolume, AssetUpdateEnum.SUB, AssetTypeEnum.FORZEN);
-                AssetUpdateInfo aui5 = new AssetUpdateInfo(so.getAccountUid(), aCoinId, txTotalPrice, AssetUpdateEnum.ADD, AssetTypeEnum.NORMAL);
-                auAbq.put(aui4);
-                auAbq.put(aui5);
-
-                // 添加交易记录
-                TxRecord txRecord = new TxRecord();
-                txRecord.setUid(UUIdUtil.getUUID());
-                txRecord.setBuyerUid(requestOrder.getAccountUid());
-                txRecord.setSellerUid(so.getAccountUid());
-                txRecord.setDealPrice(txPrice);
-                txRecord.setVolume(txVolume);
-                txRecord.setTxFee(BigDecimal.ZERO);
-                txRecord.setCreateTime(timeNow);
-                txRecord.setUpdateTime(timeNow);
-                taAbq.put(txRecord);
-//                trService.add(txRecord);
-
-                if (rVolume.compareTo(sVolume) <= 0) {
-                    break;
-                }
-                if (soIterator.hasNext()) {
-                    limitNum = limitNum << (flag <= maxFlag ? 1 : 0);
-                    flag++;
-                    soList = getUncompletedList(OrderTypeEnum.BUY, tp.getId(), limitNum);
-                    soIterator = soList.iterator();
-                }
+            if (rPrice.compareTo(sPrice) < 0) {
+                break;
             }
-//        }
+
+            txVolume = rVolume.compareTo(sVolume) < 0 ? rVolume : sVolume;
+            txTotalPrice = txPrice.multiply(txVolume);
+
+            // 更新订单
+            requestOrder.subVolume(txVolume);
+            OrderVolumeSubInfo ovsi = new OrderVolumeSubInfo(so.getUid(), txVolume, OrderTypeEnum.SELL);
+            ovsAbq.put(ovsi);
+
+            // 更新用户资产
+            aui1.addVolume(txVolume.multiply(rPrice));
+            aui2.addVolume(txVolume.multiply(rPrice.subtract(sPrice)));
+            aui3.addVolume(txVolume);
+
+            AssetUpdateInfo aui4 = new AssetUpdateInfo(so.getAccountUid(), fCoinId, txVolume, AssetUpdateEnum.SUB, AssetTypeEnum.FORZEN);
+            AssetUpdateInfo aui5 = new AssetUpdateInfo(so.getAccountUid(), aCoinId, txTotalPrice, AssetUpdateEnum.ADD, AssetTypeEnum.NORMAL);
+            auAbq.put(aui4);
+            auAbq.put(aui5);
+
+            // 添加交易记录
+            TxRecord txRecord = new TxRecord();
+            txRecord.setUid(UUIdUtil.getUUID());
+            txRecord.setBuyerUid(requestOrder.getAccountUid());
+            txRecord.setSellerUid(so.getAccountUid());
+            txRecord.setDealPrice(txPrice);
+            txRecord.setVolume(txVolume);
+            txRecord.setTxFee(BigDecimal.ZERO);
+            txRecord.setCreateTime(timeNow);
+            txRecord.setUpdateTime(timeNow);
+            taAbq.put(txRecord);
+
+            if (rVolume.compareTo(sVolume) < 0) {
+                removeOrder(OrderTypeEnum.BUY, tp.getId(), requestOrder.getUid());
+                so.subVolume(txVolume);
+                subVolume(OrderTypeEnum.SELL, tp.getId(), so.getUid(), so);
+                break;
+            } else if (rVolume.compareTo(sVolume) == 0) {
+                removeOrder(OrderTypeEnum.BUY, tp.getId(), requestOrder.getUid());
+                removeOrder(OrderTypeEnum.SELL, tp.getId(), so.getUid());
+                break;
+            } else {
+                subVolume(OrderTypeEnum.BUY, tp.getId(), requestOrder.getUid(), requestOrder);
+                removeOrder(OrderTypeEnum.SELL, tp.getId(), so.getUid());
+            }
+            if (soIterator.hasNext()) {
+                limitNum = limitNum << (flag <= maxFlag ? 1 : 0);
+                flag++;
+                soList = getUncompletedList(OrderTypeEnum.BUY, tp.getId(), limitNum);
+                soIterator = soList.iterator();
+            }
+        }
         long endTime = new Date().getTime();
         BigDecimal totalTxVolume = requestOrder.getInitialVolume().subtract(requestOrder.getVolume());
         if (totalTxVolume.compareTo(BigDecimal.ZERO) > 0) {
-            boService.subVolume(requestOrder.getUid(), totalTxVolume);
+            OrderVolumeSubInfo ovsi = new OrderVolumeSubInfo(requestOrder.getUid(), totalTxVolume, OrderTypeEnum.BUY);
+            ovsAbq.put(ovsi);
         }
         if (aui1.getVolume().compareTo(BigDecimal.ZERO) > 0) {
             auAbq.put(aui1);
@@ -201,7 +210,7 @@ public class TradingTest{
         }
 
         // 添加订单记录
-        soService.add((SellOrder) requestOrder);
+        requestOrder = soService.add((SellOrder) requestOrder);
         addOrder(OrderTypeEnum.SELL, tp.getId(), requestOrder);
 
         // 交易匹配
@@ -210,81 +219,86 @@ public class TradingTest{
         int limitNum = 1;
 
         long startTime = new Date().getTime();
-        List<BuyOrder> boList = boService.getUncompletedList(tp.getId(), limitNum);
+        List<Order> boList = getUncompletedList(OrderTypeEnum.BUY, tp.getId(), limitNum);
+        if (boList == null) {
+            return 1;
+        }
         long midTime = new Date().getTime();
-        Iterator<BuyOrder> boIterator = boList.iterator();
-
+        Iterator<Order> boIterator = boList.iterator();
 
         AssetUpdateInfo aui1 = new AssetUpdateInfo(requestOrder.getAccountUid(), fCoinId, BigDecimal.ZERO, AssetUpdateEnum.SUB, AssetTypeEnum.FORZEN);
         AssetUpdateInfo aui2 = new AssetUpdateInfo(requestOrder.getAccountUid(), aCoinId, BigDecimal.ZERO, AssetUpdateEnum.ADD, AssetTypeEnum.NORMAL);
 
-//        if (boIterator.hasNext()) {
-            while (boIterator.hasNext()) {
+        while (boIterator.hasNext()) {
 
-                BuyOrder bo = boIterator.next();
-                BigDecimal rPrice = requestOrder.getPrice();
-                BigDecimal rVolume = requestOrder.getVolume();
-                BigDecimal bPrice = bo.getPrice();
-                BigDecimal bVolume = bo.getVolume();
-                BigDecimal txPrice = bPrice;
-                BigDecimal txVolume = BigDecimal.ZERO;
-                BigDecimal txTotalPrice = BigDecimal.ZERO;
+            Order bo = boIterator.next();
+            BigDecimal rPrice = requestOrder.getPrice();
+            BigDecimal rVolume = requestOrder.getVolume();
+            BigDecimal bPrice = bo.getPrice();
+            BigDecimal bVolume = bo.getVolume();
+            BigDecimal txPrice = bPrice;
+            BigDecimal txVolume = BigDecimal.ZERO;
+            BigDecimal txTotalPrice = BigDecimal.ZERO;
 
-                if (rPrice.compareTo(bPrice) > 0) {
-                    break;
-                }
-                txVolume = rVolume.compareTo(bVolume) < 0 ? rVolume : bVolume;
-                txTotalPrice = txPrice.multiply(txVolume);
-
-                // 更新订单
-                requestOrder.subVolume(txVolume);
-                boService.subVolume(bo.getUid(), txVolume);
-
-                // 更新用户资产
-//                aaService.updateForzenAmt(requestOrder.getAccountUid(), fCoinId, txVolume, AssetUpdateEnum.SUB);
-//                aaService.updateAmt(requestOrder.getAccountUid(), aCoinId, txTotalPrice, AssetUpdateEnum.ADD);
-//                aui1.setVolume(aui1.getVolume().add(txVolume));
-//                aui2.setVolume(aui2.getVolume().add(txTotalPrice));
-                aui1.addVolume(txVolume);
-                aui2.addVolume(txTotalPrice);
-
-//                aaService.updateForzenAmt(bo.getAccountUid(), aCoinId, txTotalPrice, AssetUpdateEnum.SUB);
-//                aaService.updateAmt(bo.getAccountUid(), fCoinId, txVolume, AssetUpdateEnum.ADD);
-                AssetUpdateInfo aui3 = new AssetUpdateInfo(bo.getAccountUid(), aCoinId, txTotalPrice, AssetUpdateEnum.SUB, AssetTypeEnum.FORZEN);
-                AssetUpdateInfo aui4 = new AssetUpdateInfo(bo.getAccountUid(), fCoinId, txVolume, AssetUpdateEnum.ADD, AssetTypeEnum.NORMAL);
-                auAbq.put(aui3);
-                auAbq.put(aui4);
-
-                // 添加交易记录
-                TxRecord txRecord = new TxRecord();
-                txRecord.setUid(UUIdUtil.getUUID());
-                txRecord.setBuyerUid(requestOrder.getAccountUid());
-                txRecord.setSellerUid(bo.getAccountUid());
-                txRecord.setDealPrice(txPrice);
-                txRecord.setVolume(txVolume);
-                txRecord.setTxFee(BigDecimal.ZERO);
-                txRecord.setCreateTime(timeNow);
-                txRecord.setUpdateTime(timeNow);
-                taAbq.put(txRecord);
-//                trService.add(txRecord);
-
-                if (rVolume.compareTo(bVolume) <= 0) {
-                    break;
-                }
-                if (!boIterator.hasNext()) {
-                    limitNum = limitNum << (flag <= maxFlag ? 1 : 0);
-                    flag++;
-                    boList = boService.getUncompletedList(tp.getId(), limitNum);
-                    boIterator = boList.iterator();
-                }
+            if (rPrice.compareTo(bPrice) > 0) {
+                break;
             }
-//        }
+            txVolume = rVolume.compareTo(bVolume) < 0 ? rVolume : bVolume;
+            txTotalPrice = txPrice.multiply(txVolume);
+
+            // 更新订单
+            requestOrder.subVolume(txVolume);
+            OrderVolumeSubInfo ovsi = new OrderVolumeSubInfo(bo.getUid(), txVolume, OrderTypeEnum.BUY);
+            ovsAbq.put(ovsi);
+
+            // 更新用户资产
+            aui1.addVolume(txVolume);
+            aui2.addVolume(txTotalPrice);
+
+            AssetUpdateInfo aui3 = new AssetUpdateInfo(bo.getAccountUid(), aCoinId, txTotalPrice, AssetUpdateEnum.SUB, AssetTypeEnum.FORZEN);
+            AssetUpdateInfo aui4 = new AssetUpdateInfo(bo.getAccountUid(), fCoinId, txVolume, AssetUpdateEnum.ADD, AssetTypeEnum.NORMAL);
+            auAbq.put(aui3);
+            auAbq.put(aui4);
+
+            // 添加交易记录
+            TxRecord txRecord = new TxRecord();
+            txRecord.setUid(UUIdUtil.getUUID());
+            txRecord.setBuyerUid(requestOrder.getAccountUid());
+            txRecord.setSellerUid(bo.getAccountUid());
+            txRecord.setDealPrice(txPrice);
+            txRecord.setVolume(txVolume);
+            txRecord.setTxFee(BigDecimal.ZERO);
+            txRecord.setCreateTime(timeNow);
+            txRecord.setUpdateTime(timeNow);
+            taAbq.put(txRecord);
+
+            if (rVolume.compareTo(bVolume) < 0) {
+                removeOrder(OrderTypeEnum.SELL, tp.getId(), requestOrder.getUid());
+                bo.subVolume(txVolume);
+                subVolume(OrderTypeEnum.BUY, tp.getId(), bo.getUid(), bo);
+                break;
+            } else if (rVolume.compareTo(bVolume) == 0) {
+                removeOrder(OrderTypeEnum.SELL, tp.getId(), requestOrder.getUid());
+                removeOrder(OrderTypeEnum.BUY, tp.getId(), bo.getUid());
+                break;
+            } else {
+                subVolume(OrderTypeEnum.SELL, tp.getId(), requestOrder.getUid(), requestOrder);
+                removeOrder(OrderTypeEnum.BUY, tp.getId(), bo.getUid());
+            }
+            if (!boIterator.hasNext()) {
+                limitNum = limitNum << (flag <= maxFlag ? 1 : 0);
+                flag++;
+                boList = getUncompletedList(OrderTypeEnum.BUY, tp.getId(), limitNum);
+                boIterator = boList.iterator();
+            }
+        }
         long endTime = new Date().getTime();
         BigDecimal totalTxVolume = requestOrder.getInitialVolume().subtract(requestOrder.getVolume());
         if (totalTxVolume.compareTo(BigDecimal.ZERO) > 0) {
-            soService.subVolume(requestOrder.getUid(), totalTxVolume);
+            OrderVolumeSubInfo ovsi = new OrderVolumeSubInfo(requestOrder.getUid(), totalTxVolume, OrderTypeEnum.SELL);
+            ovsAbq.put(ovsi);
         }
-        if(aui1.getVolume().compareTo(BigDecimal.ZERO) > 0){
+        if (aui1.getVolume().compareTo(BigDecimal.ZERO) > 0) {
             auAbq.put(aui1);
             auAbq.put(aui2);
         }
@@ -293,29 +307,29 @@ public class TradingTest{
         return 1;
     }
 
-    private List<Order> getUncompletedList(OrderTypeEnum orderTypeEnum, int txPairId, long count){
+    private List<Order> getUncompletedList(OrderTypeEnum orderTypeEnum, int txPairId, long count) {
         String[] keyArr = getKey(orderTypeEnum, txPairId);
         String marketKey = keyArr[0];
         String marketDetailKey = keyArr[1];
 
         Set<String> sortedUidSet = redisService.zRange(marketKey, count);
-        if(sortedUidSet.size() == 0){
+        if (sortedUidSet.size() == 0) {
             return null;
         }
         List<String> orderJsonList = redisService.hMultiGet(marketDetailKey, sortedUidSet);
-        if(orderJsonList.size() == 0){
+        if (orderJsonList.size() == 0) {
             return null;
         }
         List<Order> orderList = new ArrayList<>();
-        for(String orderJson : orderJsonList){
+        for (String orderJson : orderJsonList) {
             orderList.add(JSON.parseObject(orderJson, Order.class));
         }
 
         return orderList;
     }
 
-    private void addOrder(OrderTypeEnum orderTypeEnum, int txPairId, Order order){
-        double score = orderTypeEnum == OrderTypeEnum.BUY? order.getPrice().doubleValue() : order.getPrice().doubleValue() * -1;
+    private void addOrder(OrderTypeEnum orderTypeEnum, int txPairId, Order order) {
+        double score = orderTypeEnum == OrderTypeEnum.BUY ? order.getPrice().doubleValue() * -1 : order.getPrice().doubleValue();
         String[] keyArr = getKey(orderTypeEnum, txPairId);
         String marketKey = keyArr[0];
         String marketDetailKey = keyArr[1];
@@ -325,7 +339,7 @@ public class TradingTest{
         redisService.hSet(marketDetailKey, order.getUid(), jsonStr);
     }
 
-    private void removeOrder(OrderTypeEnum orderTypeEnum, int txPairId, String uid){
+    private void removeOrder(OrderTypeEnum orderTypeEnum, int txPairId, String uid) {
         String[] keyArr = getKey(orderTypeEnum, txPairId);
         String marketKey = keyArr[0];
         String marketDetailKey = keyArr[1];
@@ -334,7 +348,7 @@ public class TradingTest{
         redisService.hRemove(marketDetailKey, uid);
     }
 
-    private void subVolume(OrderTypeEnum orderTypeEnum, int txPairId, String uid, Order order){
+    private void subVolume(OrderTypeEnum orderTypeEnum, int txPairId, String uid, Order order) {
         String[] keyArr = getKey(orderTypeEnum, txPairId);
         String marketKey = keyArr[0];
         String marketDetailKey = keyArr[1];
@@ -343,11 +357,11 @@ public class TradingTest{
         redisService.hSet(marketDetailKey, uid, jsonStr);
     }
 
-    private String[] getKey(OrderTypeEnum orderTypeEnum, int txPairId){
+    private String[] getKey(OrderTypeEnum orderTypeEnum, int txPairId) {
         String[] keyArr = new String[2];
         keyArr[0] = txPairId + "";
         keyArr[1] = txPairId + "";
-        switch(orderTypeEnum){
+        switch (orderTypeEnum) {
             case BUY:
                 keyArr[0] += MARKET_BUY_SUFFIX;
                 keyArr[1] += MARKET_BUY_DETAIL_SUFFIX;

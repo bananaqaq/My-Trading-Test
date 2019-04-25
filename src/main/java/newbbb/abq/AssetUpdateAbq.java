@@ -46,7 +46,7 @@ public class AssetUpdateAbq implements Runnable {
                     default:
                         break;
                 }
-                System.out.println("资产更新：\t" + ":处理完成\t" + abq.size());
+                System.out.println("资产更新：\t" + "处理完成\t" + abq.size());
             }
         }
     }

@@ -5,6 +5,7 @@ import newbbb.service.IBuyOrderService;
 import newbbb.service.ISellOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import java.util.Date;
 import java.util.concurrent.ArrayBlockingQueue;
 
 @Component
@@ -35,19 +36,19 @@ public class OrderVolumeSubAbq implements Runnable {
             while (true) {
                 if (abq.size() == 0) {
                     Thread.sleep(SLEEP_TIME);
-                } else {
+                }else {
                     OrderVolumeSubInfo ovsi = abq.remove();
                     switch (ovsi.getOrderTypeEnum()) {
                         case BUY:
-                            boService.subVolume(ovsi.getAccountUid(), ovsi.getVolume());
+                            boService.subVolume(ovsi.getUid(), ovsi.getVolume());
                             break;
                         case SELL:
-                            soService.subVolume(ovsi.getAccountUid(), ovsi.getVolume());
+                            soService.subVolume(ovsi.getUid(), ovsi.getVolume());
                             break;
                         default:
                             break;
                     }
-                    System.out.println("订单更新：\t" + ovsi.getAccountUid() + "\t" + ovsi.getVolume() + "\t" + abq.size());
+                    System.out.println("订单更新：\t" + ovsi.toString() + "\t" + abq.size());
                 }
             }
         } catch (InterruptedException e) {

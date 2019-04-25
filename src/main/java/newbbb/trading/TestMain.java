@@ -82,11 +82,14 @@ public class TestMain {
 
     public static void main(String[] args) throws Exception {
         TradingTest instance = context.getBean(TradingTest.class);
+//        for (int i = 0; i < 9000; i++) {
+//            accountService.register(new Account());
+//        }
         /*String accountUid = "1b855c98f2b341ae8c1b29728ffc64ab";
         String testAccountUid = "4bf34b3546ed49389e7c732bfe23cb79";
-        int txPairId = 2;*/
+        int txPairId = 2;
 
-        /*SellOrder s1 = new SellOrder(txPairId, accountUid, "15", "2");
+        SellOrder s1 = new SellOrder(txPairId, accountUid, "15", "2");
         SellOrder s2 = new SellOrder(txPairId, accountUid, "14", "2");
         SellOrder s3 = new SellOrder(txPairId, accountUid, "13", "2");
         SellOrder s4 = new SellOrder(txPairId, accountUid, "12", "2");
@@ -107,10 +110,10 @@ public class TestMain {
         int br2 = instance.makeTrade(b2, TxDirectionEnum.BUY);
         int br3 = instance.makeTrade(b3, TxDirectionEnum.BUY);
         int br4 = instance.makeTrade(b4, TxDirectionEnum.BUY);
-        int br5 = instance.makeTrade(b5, TxDirectionEnum.BUY);*/
+        int br5 = instance.makeTrade(b5, TxDirectionEnum.BUY);
 
 
-        /*for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 1000; i++) {
             Scanner sc = new Scanner(System.in);
             msgPrint("please enter opt type( b|s )");
             String txDirectionStr = sc.next();
@@ -126,8 +129,8 @@ public class TestMain {
                 SellOrder so = new SellOrder(txPairId, testAccountUid, priceStr, volumeStr);
                 instance.makeTrade(so, TxDirectionEnum.SELL);
             }
-        }*/
-
+        }
+*/
 
 //        redisService.zAdd("ztest", "a", 1);
 //        redisService.zAdd("ztest", "b", 2);
@@ -136,13 +139,13 @@ public class TestMain {
 //        redisService.zAdd("ztest", "e", 4);
 //        redisService.zAdd("ztest", "g", 3);
 
-//        Set<String> set =redisService.zRange("2_MARKET_BUY", 7);
+//        Set<String> set =redisService.zRange("2_MARKET_SELL", 7);
 //        for(String field:set){
 //            System.out.println(field);
 //        }
 
         TxPair tp = NBGlobalConfig.TX_PAIRS[2];
-        int userNum = 40;
+        int userNum = 1250;
         int tradingNum = 8;
         int fAmtMax = 100;
         int aAmtMax = 10000;
@@ -166,17 +169,17 @@ public class TestMain {
             BigDecimal fAmtTotal = new BigDecimal(fAmtMax);
             BigDecimal aAmtTotal = new BigDecimal(aAmtMax);
 
-//            for (int j = 0; j < tradingNum / 2; j++) {
-//                double price = priceMin + random.nextInt(priceBound * 10) / 10.0;
-//                double volume = volumeMin + random.nextInt(volumeBound * 10) / 10.0;
-//                aAmtTotal = aAmtTotal.subtract(new BigDecimal(price * volume));
-//                if(aAmtTotal.compareTo(BigDecimal.ZERO) < 0){
-//                    break;
-//                }
-//                System.out.println("B\t" + volume + "\t\t\t" + price + "\t\t\t");
-//                BuyOrder bo = new BuyOrder(tp.getId(), accountUid, price + "", volume + "");
-//                oList.add(new TradeInfo(bo, TxDirectionEnum.BUY));
-//            }
+            for (int j = 0; j < tradingNum / 2; j++) {
+                double price = priceMin + random.nextInt(priceBound * 10) / 10.0;
+                double volume = volumeMin + random.nextInt(volumeBound * 10) / 10.0;
+                aAmtTotal = aAmtTotal.subtract(new BigDecimal(price * volume));
+                if(aAmtTotal.compareTo(BigDecimal.ZERO) < 0){
+                    break;
+                }
+                System.out.println("B\t" + volume + "\t\t\t" + price + "\t\t\t");
+                BuyOrder bo = new BuyOrder(tp.getId(), accountUid, price + "", volume + "");
+                oList.add(new TradeInfo(bo, TxDirectionEnum.BUY));
+            }
             for (int j = 0; j < tradingNum / 2; j++) {
                 double price = priceMin + random.nextInt(priceBound * 10) / 10.0;
                 double volume = volumeMin + random.nextInt(volumeBound * 10) / 10.0;

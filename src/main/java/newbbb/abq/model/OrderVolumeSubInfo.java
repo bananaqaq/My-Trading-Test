@@ -6,24 +6,27 @@ import java.math.BigDecimal;
 
 public class OrderVolumeSubInfo {
 
-    private String accountUid;
+    private String uid;
 
     private BigDecimal volume;
 
     private OrderTypeEnum orderTypeEnum;
 
-    public OrderVolumeSubInfo(String accountUid, BigDecimal volume, OrderTypeEnum orderTypeEnum) {
-        this.accountUid = accountUid;
+    public OrderVolumeSubInfo() {
+    }
+
+    public OrderVolumeSubInfo(String uid, BigDecimal volume, OrderTypeEnum orderTypeEnum) {
+        this.uid = uid;
         this.volume = volume;
         this.orderTypeEnum = orderTypeEnum;
     }
 
-    public String getAccountUid() {
-        return accountUid;
+    public String getUid() {
+        return uid;
     }
 
-    public void setAccountUid(String accountUid) {
-        this.accountUid = accountUid;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public BigDecimal getVolume() {
@@ -45,7 +48,7 @@ public class OrderVolumeSubInfo {
     @Override
     public String toString() {
         return "OrderVolumeSubInfo{" +
-                "accountUid='" + accountUid + '\'' +
+                "uid='" + uid + '\'' +
                 ", volume=" + volume +
                 ", orderTypeEnum=" + orderTypeEnum +
                 '}';
