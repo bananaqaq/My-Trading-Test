@@ -1,6 +1,6 @@
 package newbbb.matchengine.mytest;
 
-import newbbb.enums.OrderStatusEnum;
+import newbbb.matchengine.enums.OrderStatusEnum;
 
 import java.math.BigDecimal;
 import java.util.Date;

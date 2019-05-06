@@ -1,12 +1,9 @@
 package newbbb.constant;
 
-import newbbb.model.Coin;
-import newbbb.model.TxPair;
-
 public class NBGlobalConfig {
 
-    public static Coin[] COINS;
-    public static TxPair[] TX_PAIRS;
+//    public static Coin[] COINS;
+//    public static TxPair[] TX_PAIRS;
 
     public final static String MARKET_BUY_SUFFIX = "_MARKET_BUY";
     public final static String MARKET_SELL_SUFFIX = "_MARKET_SELL";
