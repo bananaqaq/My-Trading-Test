@@ -11,7 +11,7 @@
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://127.0.0.1:3306/nb"
+                        connectionURL="jdbc:mysql://127.0.0.1:3306/nb_pro"
                         userId="root"
                         password="123456">
         </jdbcConnection>
@@ -75,7 +75,37 @@
                <!--enableSelectByExample="false"-->
                <!--selectByExampleQueryId="false"/>-->
 
-        <table tableName="fb_tx_pair" domainObjectName="TxPair" mapperName="TxPairDao"
+        <!--<table tableName="fb_tx_pair" domainObjectName="TxPair" mapperName="TxPairDao"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false"/>-->
+
+<!--        ========================================================================================        -->
+
+        <table tableName="account" domainObjectName="Account" mapperName="AccountDao"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false"/>
+
+        <table tableName="balance_history" domainObjectName="BalanceHistory" mapperName="BalanceHistoryDao"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false"/>
+
+        <table tableName="deal_history" domainObjectName="DealHistory" mapperName="DealHistoryDao"
+               enableCountByExample="false"
+               enableUpdateByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               selectByExampleQueryId="false"/>
+
+        <table tableName="order_history" domainObjectName="OrderHistory" mapperName="OrderHistoryDao"
                enableCountByExample="false"
                enableUpdateByExample="false"
                enableDeleteByExample="false"

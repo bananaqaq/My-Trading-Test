@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="newbbb.dao.BalanceHistoryDao">
+  <resultMap id="BaseResultMap" type="newbbb.model.BalanceHistory">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="time" jdbcType="BIGINT" property="time" />
+    <result column="account_id" jdbcType="BIGINT" property="accountId" />
+    <result column="asset" jdbcType="VARCHAR" property="asset" />
+    <result column="business" jdbcType="VARCHAR" property="business" />
+    <result column="change" jdbcType="DECIMAL" property="change" />
+    <result column="balance" jdbcType="DECIMAL" property="balance" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="newbbb.model.BalanceHistory">
+    <result column="detail" jdbcType="LONGVARCHAR" property="detail" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, time, account_id, asset, business, change, balance
+  </sql>
+  <sql id="Blob_Column_List">
+    detail
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from balance_history
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from balance_history
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="newbbb.model.BalanceHistory">
+    insert into balance_history (id, time, account_id, 
+      asset, business, change, 
+      balance, detail)
+    values (#{id,jdbcType=BIGINT}, #{time,jdbcType=BIGINT}, #{accountId,jdbcType=BIGINT}, 
+      #{asset,jdbcType=VARCHAR}, #{business,jdbcType=VARCHAR}, #{change,jdbcType=DECIMAL}, 
+      #{balance,jdbcType=DECIMAL}, #{detail,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="newbbb.model.BalanceHistory">
+    insert into balance_history
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="time != null">
+        time,
+      </if>
+      <if test="accountId != null">
+        account_id,
+      </if>
+      <if test="asset != null">
+        asset,
+      </if>
+      <if test="business != null">
+        business,
+      </if>
+      <if test="change != null">
+        change,
+      </if>
+      <if test="balance != null">
+        balance,
+      </if>
+      <if test="detail != null">
+        detail,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="time != null">
+        #{time,jdbcType=BIGINT},
+      </if>
+      <if test="accountId != null">
+        #{accountId,jdbcType=BIGINT},
+      </if>
+      <if test="asset != null">
+        #{asset,jdbcType=VARCHAR},
+      </if>
+      <if test="business != null">
+        #{business,jdbcType=VARCHAR},
+      </if>
+      <if test="change != null">
+        #{change,jdbcType=DECIMAL},
+      </if>
+      <if test="balance != null">
+        #{balance,jdbcType=DECIMAL},
+      </if>
+      <if test="detail != null">
+        #{detail,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="newbbb.model.BalanceHistory">
+    update balance_history
+    <set>
+      <if test="time != null">
+        time = #{time,jdbcType=BIGINT},
+      </if>
+      <if test="accountId != null">
+        account_id = #{accountId,jdbcType=BIGINT},
+      </if>
+      <if test="asset != null">
+        asset = #{asset,jdbcType=VARCHAR},
+      </if>
+      <if test="business != null">
+        business = #{business,jdbcType=VARCHAR},
+      </if>
+      <if test="change != null">
+        change = #{change,jdbcType=DECIMAL},
+      </if>
+      <if test="balance != null">
+        balance = #{balance,jdbcType=DECIMAL},
+      </if>
+      <if test="detail != null">
+        detail = #{detail,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="newbbb.model.BalanceHistory">
+    update balance_history
+    set time = #{time,jdbcType=BIGINT},
+      account_id = #{accountId,jdbcType=BIGINT},
+      asset = #{asset,jdbcType=VARCHAR},
+      business = #{business,jdbcType=VARCHAR},
+      change = #{change,jdbcType=DECIMAL},
+      balance = #{balance,jdbcType=DECIMAL},
+      detail = #{detail,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="newbbb.model.BalanceHistory">
+    update balance_history
+    set time = #{time,jdbcType=BIGINT},
+      account_id = #{accountId,jdbcType=BIGINT},
+      asset = #{asset,jdbcType=VARCHAR},
+      business = #{business,jdbcType=VARCHAR},
+      change = #{change,jdbcType=DECIMAL},
+      balance = #{balance,jdbcType=DECIMAL}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>
