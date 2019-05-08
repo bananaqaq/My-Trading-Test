@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 public class Asset {
 
     private String name;
-    private Integer save;
-    private Integer show;
+    private Integer precSave;
+    private Integer precShow;
 
 }

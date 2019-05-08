@@ -4,15 +4,17 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.util.List;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class Settings {
 
     private Integer assetNum;
-    private Asset assets;
+    private List<Asset> assets;
     private Integer marketNum;
-    private Market markets;
+    private List<Market> markets;
     private String borkers;
     private Integer sliceInterval;
     private Integer sliceKeepTime;

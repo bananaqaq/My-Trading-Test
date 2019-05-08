@@ -1,7 +1,10 @@
 package newbbb.matchengine.mytest;
 
+import com.alibaba.fastjson.JSONArray;
+import newbbb.matchengine.MEConfig;
 import newbbb.matchengine.enums.AssetsUpateEnum;
 import newbbb.matchengine.enums.TxDirectionEnum;
+import newbbb.model.me.Asset;
 import newbbb.util.UUIdUtil;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -137,6 +140,11 @@ public class Trading {
 
 
         }*/
+        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:spring/application-context.xml");
+        MEConfig config = context.getBean(MEConfig.class);
+        config.InitConfig();
+        System.out.println(config.settings.getAssets());
+
 
     }
 
