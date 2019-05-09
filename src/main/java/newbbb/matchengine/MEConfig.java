@@ -12,7 +12,7 @@ import java.util.List;
 @Component
 public class MEConfig {
 
-    public static Settings settings;
+    private static Settings settings;
 
     @Value("${config.assets}")
     private String assetsJson;
@@ -31,6 +31,10 @@ public class MEConfig {
         settings.setMarkets(markets);
 
         return 0;
+    }
+
+    public Settings settings(){
+        return settings;
     }
 
 }

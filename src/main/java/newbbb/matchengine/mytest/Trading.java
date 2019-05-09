@@ -143,7 +143,7 @@ public class Trading {
         ApplicationContext context = new ClassPathXmlApplicationContext("classpath:spring/application-context.xml");
         MEConfig config = context.getBean(MEConfig.class);
         config.InitConfig();
-        System.out.println(config.settings.getAssets());
+        System.out.println(config.settings().getAssets());
 
 
     }
