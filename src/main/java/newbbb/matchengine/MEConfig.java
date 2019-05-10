@@ -5,11 +5,14 @@ import newbbb.model.me.Asset;
 import newbbb.model.me.Market;
 import newbbb.model.me.Settings;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Component
+@Order(2)
 public class MEConfig {
 
     private static Settings settings;
@@ -20,7 +23,9 @@ public class MEConfig {
     @Value("${config.markets}")
     private String marketsJson;
 
-    public int InitConfig(){
+    @PostConstruct
+    private void InitConfig(){
+
         settings = new Settings();
         List<Asset> assets = JSONArray.parseArray(assetsJson, Asset.class);
         settings.setAssetNum(assets.size());
@@ -30,7 +35,6 @@ public class MEConfig {
         settings.setMarketNum(markets.size());
         settings.setMarkets(markets);
 
-        return 0;
     }
 
     public Settings settings(){
