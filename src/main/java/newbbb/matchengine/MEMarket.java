@@ -26,7 +26,7 @@ public class MEMarket {
         return cmp;
     }
 
-    public Market MarketCreate(){
+    public Market MarketCreate(Market market){
 
         return null;
     }
