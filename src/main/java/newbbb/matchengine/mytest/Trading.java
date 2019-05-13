@@ -2,6 +2,7 @@ package newbbb.matchengine.mytest;
 
 import com.alibaba.fastjson.JSONArray;
 import newbbb.matchengine.MEConfig;
+import newbbb.matchengine.METrade;
 import newbbb.matchengine.enums.AssetsUpateEnum;
 import newbbb.matchengine.enums.TxDirectionEnum;
 import newbbb.model.me.Asset;
@@ -140,13 +141,12 @@ public class Trading {
 
 
         }*/
-//        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:spring/application-context.xml");
-//        MEConfig config = context.getBean(MEConfig.class);
-//        System.out.println(config.settings().getAssets());
-        HashMap<String, BigDecimal> map = new HashMap<>();
-        map.put("11", new BigDecimal("100"));
-        System.out.println(map.replace("22", new BigDecimal("100")));
-//        System.out.println(map.put("11", new BigDecimal("200")));
+        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:spring/application-context.xml");
+        MEConfig config = context.getBean(MEConfig.class);
+        System.out.println(config.settings().getAssets());
+        System.out.println(config.settings().getMarkets());
+        METrade trade = context.getBean(METrade.class);
+        System.out.println(trade.getMarket("BTCBCH"));
 
     }
 

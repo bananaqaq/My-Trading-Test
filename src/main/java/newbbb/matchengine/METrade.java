@@ -1,18 +1,35 @@
 package newbbb.matchengine;
 
 import newbbb.model.me.Market;
+import newbbb.model.me.TradingMarket;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 
+@Component
+@org.springframework.core.annotation.Order(8)
 public class METrade {
 
-    private static HashMap<String, Market> markets;
+    private static HashMap<String, TradingMarket> markets;
 
-    public int InitTrade(){
+    @Autowired
+    private MEConfig meConfig;
+
+    @Autowired
+    private MEMarket meMarket;
+
+    @PostConstruct
+    private void InitTrade(){
         markets = new HashMap<>();
-        return 0;
+        for(Market market : meConfig.settings().getMarkets()){
+            TradingMarket tm = meMarket.MarketCreate(market);
+            markets.put(tm.getName(), tm);
+        }
     }
 
-    public Market getMarket(String name){
+    public TradingMarket getMarket(String name){
         return markets.get(name);
     }
 
