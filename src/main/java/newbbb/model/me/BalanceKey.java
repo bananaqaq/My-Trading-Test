@@ -14,4 +14,12 @@ public class BalanceKey {
     private BalanceTypeEnum type;
     private String asset;
 
+    public BalanceKey() {
+    }
+
+    public BalanceKey(Long accountId, BalanceTypeEnum type, String asset) {
+        this.accountId = accountId;
+        this.type = type;
+        this.asset = asset;
+    }
 }
