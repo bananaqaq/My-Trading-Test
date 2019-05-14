@@ -80,13 +80,15 @@ public class MEMarket {
     }
 
 
-    public int OrderPut(String marketName, Order order) {
+    public int OrderPut(TradingMarket tm, Order order) {
 
         if (order.getType() == OrderTypeEnum.LIMIT) {
             return -1;
         }
 
+        tm.getOrders().put(order.getId(), order);
 
+        tm.getAccounts().get(order.getAccountId());
 
 
         return 0;
