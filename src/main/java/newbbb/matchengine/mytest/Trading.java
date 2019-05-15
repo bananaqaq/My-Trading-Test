@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONArray;
 import newbbb.matchengine.MEConfig;
 import newbbb.matchengine.METrade;
 import newbbb.matchengine.enums.AssetsUpateEnum;
+import newbbb.matchengine.enums.OrderSideEnum;
+import newbbb.matchengine.enums.OrderTypeEnum;
 import newbbb.matchengine.enums.TxDirectionEnum;
 import newbbb.model.me.Asset;
 import newbbb.util.UUIdUtil;
@@ -11,6 +13,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class Trading {
 
@@ -141,13 +144,16 @@ public class Trading {
 
 
         }*/
-        ApplicationContext context = new ClassPathXmlApplicationContext("classpath:spring/application-context.xml");
+        /*ApplicationContext context = new ClassPathXmlApplicationContext("classpath:spring/application-context.xml");
         MEConfig config = context.getBean(MEConfig.class);
         System.out.println(config.settings().getAssets());
         System.out.println(config.settings().getMarkets());
         METrade trade = context.getBean(METrade.class);
-        System.out.println(trade.getMarket("BTCBCH"));
+        System.out.println(trade.getMarket("BTCBCH"));*/
 
+        HashMap<String, Integer> map = new HashMap<>();
+        Integer i1 = map.put("1", 1);
+        Integer i2 = map.put("1", 2);
     }
 
     private static class TradeInfo {
