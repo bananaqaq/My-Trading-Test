@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="newbbb.dao.OrderDetailDao">
+  <resultMap id="BaseResultMap" type="newbbb.model.OrderDetail">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="create_time" jdbcType="BIGINT" property="createTime" />
+    <result column="finish_time" jdbcType="BIGINT" property="finishTime" />
+    <result column="account_id" jdbcType="BIGINT" property="accountId" />
+    <result column="market" jdbcType="VARCHAR" property="market" />
+    <result column="source" jdbcType="VARCHAR" property="source" />
+    <result column="t" jdbcType="TINYINT" property="t" />
+    <result column="side" jdbcType="TINYINT" property="side" />
+    <result column="price" jdbcType="DECIMAL" property="price" />
+    <result column="amount" jdbcType="DECIMAL" property="amount" />
+    <result column="taker_fee" jdbcType="DECIMAL" property="takerFee" />
+    <result column="maker_fee" jdbcType="DECIMAL" property="makerFee" />
+    <result column="deal_stock" jdbcType="DECIMAL" property="dealStock" />
+    <result column="deal_money" jdbcType="DECIMAL" property="dealMoney" />
+    <result column="deal_fee" jdbcType="DECIMAL" property="dealFee" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, create_time, finish_time, account_id, market, source, t, side, price, amount, 
+    taker_fee, maker_fee, deal_stock, deal_money, deal_fee
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from order_detail
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from order_detail
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="newbbb.model.OrderDetail">
+    insert into order_detail (id, create_time, finish_time, 
+      account_id, market, source, 
+      t, side, price, amount, 
+      taker_fee, maker_fee, deal_stock, 
+      deal_money, deal_fee)
+    values (#{id,jdbcType=BIGINT}, #{createTime,jdbcType=BIGINT}, #{finishTime,jdbcType=BIGINT}, 
+      #{accountId,jdbcType=BIGINT}, #{market,jdbcType=VARCHAR}, #{source,jdbcType=VARCHAR}, 
+      #{t,jdbcType=TINYINT}, #{side,jdbcType=TINYINT}, #{price,jdbcType=DECIMAL}, #{amount,jdbcType=DECIMAL}, 
+      #{takerFee,jdbcType=DECIMAL}, #{makerFee,jdbcType=DECIMAL}, #{dealStock,jdbcType=DECIMAL}, 
+      #{dealMoney,jdbcType=DECIMAL}, #{dealFee,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="newbbb.model.OrderDetail">
+    insert into order_detail
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="finishTime != null">
+        finish_time,
+      </if>
+      <if test="accountId != null">
+        account_id,
+      </if>
+      <if test="market != null">
+        market,
+      </if>
+      <if test="source != null">
+        source,
+      </if>
+      <if test="t != null">
+        t,
+      </if>
+      <if test="side != null">
+        side,
+      </if>
+      <if test="price != null">
+        price,
+      </if>
+      <if test="amount != null">
+        amount,
+      </if>
+      <if test="takerFee != null">
+        taker_fee,
+      </if>
+      <if test="makerFee != null">
+        maker_fee,
+      </if>
+      <if test="dealStock != null">
+        deal_stock,
+      </if>
+      <if test="dealMoney != null">
+        deal_money,
+      </if>
+      <if test="dealFee != null">
+        deal_fee,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="finishTime != null">
+        #{finishTime,jdbcType=BIGINT},
+      </if>
+      <if test="accountId != null">
+        #{accountId,jdbcType=BIGINT},
+      </if>
+      <if test="market != null">
+        #{market,jdbcType=VARCHAR},
+      </if>
+      <if test="source != null">
+        #{source,jdbcType=VARCHAR},
+      </if>
+      <if test="t != null">
+        #{t,jdbcType=TINYINT},
+      </if>
+      <if test="side != null">
+        #{side,jdbcType=TINYINT},
+      </if>
+      <if test="price != null">
+        #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="amount != null">
+        #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="takerFee != null">
+        #{takerFee,jdbcType=DECIMAL},
+      </if>
+      <if test="makerFee != null">
+        #{makerFee,jdbcType=DECIMAL},
+      </if>
+      <if test="dealStock != null">
+        #{dealStock,jdbcType=DECIMAL},
+      </if>
+      <if test="dealMoney != null">
+        #{dealMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="dealFee != null">
+        #{dealFee,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="newbbb.model.OrderDetail">
+    update order_detail
+    <set>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=BIGINT},
+      </if>
+      <if test="finishTime != null">
+        finish_time = #{finishTime,jdbcType=BIGINT},
+      </if>
+      <if test="accountId != null">
+        account_id = #{accountId,jdbcType=BIGINT},
+      </if>
+      <if test="market != null">
+        market = #{market,jdbcType=VARCHAR},
+      </if>
+      <if test="source != null">
+        source = #{source,jdbcType=VARCHAR},
+      </if>
+      <if test="t != null">
+        t = #{t,jdbcType=TINYINT},
+      </if>
+      <if test="side != null">
+        side = #{side,jdbcType=TINYINT},
+      </if>
+      <if test="price != null">
+        price = #{price,jdbcType=DECIMAL},
+      </if>
+      <if test="amount != null">
+        amount = #{amount,jdbcType=DECIMAL},
+      </if>
+      <if test="takerFee != null">
+        taker_fee = #{takerFee,jdbcType=DECIMAL},
+      </if>
+      <if test="makerFee != null">
+        maker_fee = #{makerFee,jdbcType=DECIMAL},
+      </if>
+      <if test="dealStock != null">
+        deal_stock = #{dealStock,jdbcType=DECIMAL},
+      </if>
+      <if test="dealMoney != null">
+        deal_money = #{dealMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="dealFee != null">
+        deal_fee = #{dealFee,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="newbbb.model.OrderDetail">
+    update order_detail
+    set create_time = #{createTime,jdbcType=BIGINT},
+      finish_time = #{finishTime,jdbcType=BIGINT},
+      account_id = #{accountId,jdbcType=BIGINT},
+      market = #{market,jdbcType=VARCHAR},
+      source = #{source,jdbcType=VARCHAR},
+      t = #{t,jdbcType=TINYINT},
+      side = #{side,jdbcType=TINYINT},
+      price = #{price,jdbcType=DECIMAL},
+      amount = #{amount,jdbcType=DECIMAL},
+      taker_fee = #{takerFee,jdbcType=DECIMAL},
+      maker_fee = #{makerFee,jdbcType=DECIMAL},
+      deal_stock = #{dealStock,jdbcType=DECIMAL},
+      deal_money = #{dealMoney,jdbcType=DECIMAL},
+      deal_fee = #{dealFee,jdbcType=DECIMAL}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

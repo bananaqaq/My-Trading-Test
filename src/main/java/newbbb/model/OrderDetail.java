@@ -2,7 +2,7 @@ package newbbb.model;
 
 import java.math.BigDecimal;
 
-public class OrderHistory {
+public class OrderDetail {
     private Long id;
 
     private Long createTime;

@@ -94,7 +94,7 @@ public class MEMarket {
         return 0;
     }
 
-    public int MarketPutLimitOrder(TradingMarket tm, long askCount, BigDecimal askAmt, long bidCount, BigDecimal bidAmt){
+    public int PutLimitOrder(TradingMarket tm, long askCount, BigDecimal askAmt, long bidCount, BigDecimal bidAmt){
 
         return 0;
     }
@@ -212,19 +212,32 @@ public class MEMarket {
         return 0;
     }
 
-    private int appendBalanceTradeAdd(){
+    private int appendBalanceTradeAdd(Order order, String asset, BigDecimal change, BigDecimal price, BigDecimal amt){
+
         return 0;
     }
 
-    private int appendBalanceTradeSub(){
+    private int appendBalanceTradeSub(Order order, String asset, BigDecimal change, BigDecimal price, BigDecimal amt){
         return 0;
     }
 
-    private int appendBalanceFee(){
+    private int appendBalanceFee(Order order, String asset, BigDecimal change, BigDecimal price, BigDecimal amt, BigDecimal feeRate){
         return 0;
     }
 
-    private int executeLimieAskOrder(){
+    private int executeLimitAskOrder(boolean real, TradingMarket tm, Order taker){
+        return 0;
+    }
+
+    private int executeLimitBidOrder(boolean real, TradingMarket tm, Order taker){
+        return 0;
+    }
+
+    private int executeMarketAskOrder(boolean real, TradingMarket tm, Order taker){
+        return 0;
+    }
+
+    private int executeMarketBidOrder(boolean real, TradingMarket tm, Order taker){
         return 0;
     }
 }

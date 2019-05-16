@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="newbbb.dao.DealHistoryDao">
-  <resultMap id="BaseResultMap" type="newbbb.model.DealHistory">
+<mapper namespace="newbbb.dao.AccountDealHistoryDao">
+  <resultMap id="BaseResultMap" type="newbbb.model.AccountDealHistory">
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="time" jdbcType="BIGINT" property="time" />
     <result column="account_id" jdbcType="BIGINT" property="accountId" />
+    <result column="market" jdbcType="VARCHAR" property="market" />
     <result column="deal_id" jdbcType="BIGINT" property="dealId" />
     <result column="order_id" jdbcType="BIGINT" property="orderId" />
     <result column="deal_order_id" jdbcType="BIGINT" property="dealOrderId" />
+    <result column="side" jdbcType="TINYINT" property="side" />
     <result column="role" jdbcType="TINYINT" property="role" />
     <result column="price" jdbcType="DECIMAL" property="price" />
     <result column="amount" jdbcType="DECIMAL" property="amount" />
@@ -16,31 +18,33 @@
     <result column="deal_fee" jdbcType="DECIMAL" property="dealFee" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, time, account_id, deal_id, order_id, deal_order_id, role, price, amount, deal, 
-    fee, deal_fee
+    id, time, account_id, market, deal_id, order_id, deal_order_id, side, role, price, 
+    amount, deal, fee, deal_fee
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from deal_history
+    from account_deal_history
     where id = #{id,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from deal_history
+    delete from account_deal_history
     where id = #{id,jdbcType=BIGINT}
   </delete>
-  <insert id="insert" parameterType="newbbb.model.DealHistory">
-    insert into deal_history (id, time, account_id, 
-      deal_id, order_id, deal_order_id, 
-      role, price, amount, 
-      deal, fee, deal_fee)
+  <insert id="insert" parameterType="newbbb.model.AccountDealHistory">
+    insert into account_deal_history (id, time, account_id, 
+      market, deal_id, order_id, 
+      deal_order_id, side, role, 
+      price, amount, deal, 
+      fee, deal_fee)
     values (#{id,jdbcType=BIGINT}, #{time,jdbcType=BIGINT}, #{accountId,jdbcType=BIGINT}, 
-      #{dealId,jdbcType=BIGINT}, #{orderId,jdbcType=BIGINT}, #{dealOrderId,jdbcType=BIGINT}, 
-      #{role,jdbcType=TINYINT}, #{price,jdbcType=DECIMAL}, #{amount,jdbcType=DECIMAL}, 
-      #{deal,jdbcType=DECIMAL}, #{fee,jdbcType=DECIMAL}, #{dealFee,jdbcType=DECIMAL})
+      #{market,jdbcType=VARCHAR}, #{dealId,jdbcType=BIGINT}, #{orderId,jdbcType=BIGINT}, 
+      #{dealOrderId,jdbcType=BIGINT}, #{side,jdbcType=TINYINT}, #{role,jdbcType=TINYINT}, 
+      #{price,jdbcType=DECIMAL}, #{amount,jdbcType=DECIMAL}, #{deal,jdbcType=DECIMAL}, 
+      #{fee,jdbcType=DECIMAL}, #{dealFee,jdbcType=DECIMAL})
   </insert>
-  <insert id="insertSelective" parameterType="newbbb.model.DealHistory">
-    insert into deal_history
+  <insert id="insertSelective" parameterType="newbbb.model.AccountDealHistory">
+    insert into account_deal_history
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
@@ -51,6 +55,9 @@
       <if test="accountId != null">
         account_id,
       </if>
+      <if test="market != null">
+        market,
+      </if>
       <if test="dealId != null">
         deal_id,
       </if>
@@ -59,6 +66,9 @@
       </if>
       <if test="dealOrderId != null">
         deal_order_id,
+      </if>
+      <if test="side != null">
+        side,
       </if>
       <if test="role != null">
         role,
@@ -89,6 +99,9 @@
       <if test="accountId != null">
         #{accountId,jdbcType=BIGINT},
       </if>
+      <if test="market != null">
+        #{market,jdbcType=VARCHAR},
+      </if>
       <if test="dealId != null">
         #{dealId,jdbcType=BIGINT},
       </if>
@@ -97,6 +110,9 @@
       </if>
       <if test="dealOrderId != null">
         #{dealOrderId,jdbcType=BIGINT},
+      </if>
+      <if test="side != null">
+        #{side,jdbcType=TINYINT},
       </if>
       <if test="role != null">
         #{role,jdbcType=TINYINT},
@@ -118,14 +134,17 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="newbbb.model.DealHistory">
-    update deal_history
+  <update id="updateByPrimaryKeySelective" parameterType="newbbb.model.AccountDealHistory">
+    update account_deal_history
     <set>
       <if test="time != null">
         time = #{time,jdbcType=BIGINT},
       </if>
       <if test="accountId != null">
         account_id = #{accountId,jdbcType=BIGINT},
+      </if>
+      <if test="market != null">
+        market = #{market,jdbcType=VARCHAR},
       </if>
       <if test="dealId != null">
         deal_id = #{dealId,jdbcType=BIGINT},
@@ -135,6 +154,9 @@
       </if>
       <if test="dealOrderId != null">
         deal_order_id = #{dealOrderId,jdbcType=BIGINT},
+      </if>
+      <if test="side != null">
+        side = #{side,jdbcType=TINYINT},
       </if>
       <if test="role != null">
         role = #{role,jdbcType=TINYINT},
@@ -157,13 +179,15 @@
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
-  <update id="updateByPrimaryKey" parameterType="newbbb.model.DealHistory">
-    update deal_history
+  <update id="updateByPrimaryKey" parameterType="newbbb.model.AccountDealHistory">
+    update account_deal_history
     set time = #{time,jdbcType=BIGINT},
       account_id = #{accountId,jdbcType=BIGINT},
+      market = #{market,jdbcType=VARCHAR},
       deal_id = #{dealId,jdbcType=BIGINT},
       order_id = #{orderId,jdbcType=BIGINT},
       deal_order_id = #{dealOrderId,jdbcType=BIGINT},
+      side = #{side,jdbcType=TINYINT},
       role = #{role,jdbcType=TINYINT},
       price = #{price,jdbcType=DECIMAL},
       amount = #{amount,jdbcType=DECIMAL},

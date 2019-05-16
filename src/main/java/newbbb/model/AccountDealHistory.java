@@ -2,18 +2,22 @@ package newbbb.model;
 
 import java.math.BigDecimal;
 
-public class DealHistory {
+public class AccountDealHistory {
     private Long id;
 
     private Long time;
 
     private Long accountId;
 
+    private String market;
+
     private Long dealId;
 
     private Long orderId;
 
     private Long dealOrderId;
+
+    private Byte side;
 
     private Byte role;
 
@@ -51,6 +55,14 @@ public class DealHistory {
         this.accountId = accountId;
     }
 
+    public String getMarket() {
+        return market;
+    }
+
+    public void setMarket(String market) {
+        this.market = market == null ? null : market.trim();
+    }
+
     public Long getDealId() {
         return dealId;
     }
@@ -73,6 +85,14 @@ public class DealHistory {
 
     public void setDealOrderId(Long dealOrderId) {
         this.dealOrderId = dealOrderId;
+    }
+
+    public Byte getSide() {
+        return side;
+    }
+
+    public void setSide(Byte side) {
+        this.side = side;
     }
 
     public Byte getRole() {
