@@ -11,15 +11,17 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 @Component
 @org.springframework.core.annotation.Order(7)
 public class MEMarket {
 
-    private int orderIdStart;
-    private int dealIdStart;
+    private long orderIdStart;
+    private long dealIdStart;
 
     @Autowired
     private MEBalance meBalance;
@@ -127,6 +129,9 @@ public class MEMarket {
 
     }
 
+
+
+
     private int orderPut(TradingMarket tm, Order order) {
         if (order.getType() == OrderTypeEnum.LIMIT) {
             return -1;
@@ -225,7 +230,45 @@ public class MEMarket {
         return 0;
     }
 
-    private int executeLimitAskOrder(boolean real, TradingMarket tm, Order taker){
+    private int executeLimitAskOrder(boolean real, TradingMarket tm, Order taker) {
+        BigDecimal price;
+        BigDecimal amt;
+        BigDecimal deal;
+        BigDecimal askFee;
+        BigDecimal bidFee;
+        BigDecimal result;
+
+        Iterator<Order> iterator = tm.getBids().iterator();
+        while (iterator.hasNext()) {
+            if (taker.getLeft().compareTo(BigDecimal.ZERO) == 0) {
+                break;
+            }
+
+            Order maker = iterator.next();
+            if (taker.getPrice().compareTo(maker.getPrice()) > 0) {
+                break;
+            }
+
+            price = maker.getPrice();
+            if (taker.getLeft().compareTo(maker.getLeft()) < 0) {
+                amt = taker.getLeft();
+            } else {
+                amt = maker.getLeft();
+            }
+
+            deal = price.multiply(amt);
+            askFee = deal.multiply(taker.getTakerFee());
+            bidFee = deal.multiply(maker.getMakerFee());
+
+            Long timeNow = new Date().getTime();
+            taker.setUpdateTime(timeNow);
+            maker.setUpdateTime(timeNow);
+            Long dealId = ++dealIdStart;
+            if(real){
+                
+            }
+        }
+
         return 0;
     }
 
