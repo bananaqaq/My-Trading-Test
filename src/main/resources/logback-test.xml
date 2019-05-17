@@ -50,7 +50,7 @@
         <appender-ref ref="file.async" /><!-- 即com.lin包下级别为 ${log.root.level}的才会使用file.async来打印 -->
     </logger>
 
-    <!-- root将级别为${log.root.level}及大于${log.root.level}的日志信息交给已经配置好的名为“Console”的appender处理，“Console”appender将信息打印到Console,其它同理 -->
+    <!-- root将级别为${log.root.level}及大于${log.root.level}的日志信息交给已经配置好的名为“Con   sole”的appender处理，“Console”appender将信息打印到Console,其它同理 -->
     <root level="${log.root.level}">
         <appender-ref ref="stdout" /> <!--  标识这个appender将会添加到这个logger -->
         <appender-ref ref="file.async" />
