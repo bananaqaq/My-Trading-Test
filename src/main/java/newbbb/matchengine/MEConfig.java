@@ -12,7 +12,7 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Component
-@Order(2)
+@Order(1)
 public class MEConfig {
 
     private static Settings settings;

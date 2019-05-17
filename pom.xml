@@ -20,6 +20,9 @@
         <dbcp.version>2.2.0</dbcp.version>
         <pagehelper.version>4.0.0</pagehelper.version>
         <fastjson.version>1.2.44</fastjson.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <logback.version>1.2.3</logback.version>
+        <logback.spring.version>0.1.4</logback.spring.version>
     </properties>
 
     <dependencies>
@@ -116,7 +119,32 @@
             <version>${fastjson.version}</version>
         </dependency>
 
+        <!-- log configure -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
 
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.logback-extensions</groupId>
+            <artifactId>logback-ext-spring</artifactId>
+            <version>${logback.spring.version}</version>
+        </dependency>
+
+        <!-- lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

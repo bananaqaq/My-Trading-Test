@@ -9,7 +9,7 @@ import javax.annotation.PostConstruct;
 import java.util.HashMap;
 
 @Component
-@org.springframework.core.annotation.Order(8)
+@org.springframework.core.annotation.Order(6)
 public class METrade {
 
     private static HashMap<String, TradingMarket> markets;

@@ -8,6 +8,7 @@ import newbbb.matchengine.enums.OrderSideEnum;
 import newbbb.matchengine.enums.OrderTypeEnum;
 import newbbb.matchengine.enums.TxDirectionEnum;
 import newbbb.model.me.Asset;
+import newbbb.util.CodeUtil;
 import newbbb.util.UUIdUtil;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -151,9 +152,8 @@ public class Trading {
         METrade trade = context.getBean(METrade.class);
         System.out.println(trade.getMarket("BTCBCH"));*/
 
-        HashMap<String, Integer> map = new HashMap<>();
-        Integer i1 = map.put("1", 1);
-        Integer i2 = map.put("1", 2);
+
+        System.out.println(CodeUtil.LineNo());
     }
 
     private static class TradeInfo {

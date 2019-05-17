@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Component
-@Order(5)
+@Order(2)
 public class MEBalance {
 
     private static HashMap<String, Asset> assets;
