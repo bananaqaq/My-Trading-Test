@@ -1,8 +1,7 @@
 package newbbb.matchengine;
 
 import com.alibaba.fastjson.JSONObject;
-import lombok.extern.java.Log;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import newbbb.matchengine.enums.*;
 import newbbb.model.me.BalanceKey;
 import newbbb.model.me.Market;
@@ -11,7 +10,6 @@ import newbbb.model.me.TradingMarket;
 import newbbb.util.CodeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.Date;
@@ -21,7 +19,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 
 @Component
 @org.springframework.core.annotation.Order(5)
-@Log
+@Slf4j
 public class MEMarket {
 
     private long orderIdStart;
@@ -108,20 +106,20 @@ public class MEMarket {
 
     public int PutLimitOrder(boolean real, JSONObject result, TradingMarket tm, long accountId,
                              OrderSideEnum side, BigDecimal amt, BigDecimal price, BigDecimal takerFee, BigDecimal makerFee, String source) {
-        if(side == OrderSideEnum.ASK){
+        if (side == OrderSideEnum.ASK) {
             BigDecimal balance = meBalance.BalanceGet(new BalanceKey(accountId, BalanceTypeEnum.AVAILABLE, tm.getStock()));
-            if(balance == null || balance.compareTo(amt) < 0){
+            if (balance == null || balance.compareTo(amt) < 0) {
                 return -1;
             }
-        }else{
+        } else {
             BigDecimal balance = meBalance.BalanceGet(new BalanceKey(accountId, BalanceTypeEnum.AVAILABLE, tm.getMoney()));
             BigDecimal require = amt.multiply(price);
-            if(balance == null || balance.compareTo(require) < 0){
+            if (balance == null || balance.compareTo(require) < 0) {
                 return -1;
             }
         }
 
-        if(amt.compareTo(tm.getMinAmount()) < 0){
+        if (amt.compareTo(tm.getMinAmount()) < 0) {
             return -2;
         }
 
@@ -145,38 +143,110 @@ public class MEMarket {
         order.setDealFee(BigDecimal.ZERO);
 
         int ret;
-        if(side == OrderSideEnum.ASK){
+        if (side == OrderSideEnum.ASK) {
             ret = executeLimitAskOrder(real, tm, order);
-        }else{
+        } else {
             ret = executeLimitBidOrder(real, tm, order);
         }
-        if(ret < 0){
+        if (ret < 0) {
             return CodeUtil.ErrLineNo();
         }
 
-        if(order.getLeft().compareTo(BigDecimal.ZERO) == 0){
-            if(real){
-                ret = meHistory.appendOrderHistory(order);
-                if(ret < 0){
-
+        if (order.getLeft().compareTo(BigDecimal.ZERO) == 0) {
+            if (real) {
+                ret = meHistory.AppendOrderHistory(order);
+                if (ret < 0) {
+                    log.error("append_order_history fail: {}, order: {}", ret, order.getId());
                 }
                 meMessage.PushOrderMsg(OrderEventEnum.FINISH, order, tm);
                 result = GetOrderInfo(order);
             }
         } else {
-            if(real){
+            if (real) {
                 meMessage.PushOrderMsg(OrderEventEnum.PUT, order, tm);
                 result = GetOrderInfo(order);
             }
             ret = orderPut(tm, order);
-            if(ret < 0){
-
+            if (ret < 0) {
+                log.error("order_put fail: {}, order: {}", ret, order.getId());
             }
         }
         return 0;
     }
 
-    public int PutMarketOrder() {
+    public int PutMarketOrder(boolean real, JSONObject result, TradingMarket tm, long accountId,
+                              OrderSideEnum side, BigDecimal amt, BigDecimal takerFee, String source) {
+        if (side == OrderSideEnum.ASK) {
+            BigDecimal balance = meBalance.BalanceGet(new BalanceKey(accountId, BalanceTypeEnum.AVAILABLE, tm.getStock()));
+            if (balance == null || balance.compareTo(amt) < 0) {
+                return -1;
+            }
+
+            Iterator<Order> iterator = tm.getBids().iterator();
+            if (!iterator.hasNext()) {
+                return -3;
+            }
+
+            if (amt.compareTo(tm.getMinAmount()) < 0) {
+                return -2;
+            }
+        } else {
+            BigDecimal balance = meBalance.BalanceGet(new BalanceKey(accountId, BalanceTypeEnum.AVAILABLE, tm.getMoney()));
+            if(balance == null || balance.compareTo(amt) < 0){
+                return -1;
+            }
+
+            Iterator<Order> iterator = tm.getAsks().iterator();
+            if(!iterator.hasNext()){
+                return -3;
+            }
+
+            Order order = iterator.next();
+            BigDecimal require = order.getPrice().multiply(tm.getMinAmount());
+            if(amt.compareTo(require) < 0){
+                return -2;
+            }
+        }
+
+        Order order = new Order();
+        order.setId(++orderIdStart);
+        order.setType(OrderTypeEnum.LIMIT);
+        order.setSide(side);
+        order.setCreateTime(new Date().getTime());
+        order.setUpdateTime(order.getCreateTime());
+        order.setMarket(tm.getName());
+        order.setSource(source);
+        order.setAccountId(accountId);
+        order.setPrice(BigDecimal.ZERO);
+        order.setAmount(amt);
+        order.setTakerFee(takerFee);
+        order.setMakerFee(BigDecimal.ZERO);
+        order.setLeft(amt);
+        order.setFreeze(BigDecimal.ZERO);
+        order.setDealStock(BigDecimal.ZERO);
+        order.setDealMoney(BigDecimal.ZERO);
+        order.setDealFee(BigDecimal.ZERO);
+
+        int ret;
+        if(side == OrderSideEnum.ASK){
+            ret = executeMarketAskOrder(real, tm, order);
+        }else{
+            ret = executeMarketBidOrder(real, tm, order);
+        }
+        if(ret < 0){
+            log.error("execute order: {} fail: {}", order.getId(), ret);
+            return CodeUtil.LineNo();
+        }
+
+        if(real){
+            ret = meHistory.AppendOrderHistory(order);
+            if(ret < 0){
+                log.error("append_order_history fail: {}, order: {}", ret, order.getId());
+            }
+            meMessage.PushOrderMsg(OrderEventEnum.FINISH, order, tm);
+            result = GetOrderInfo(order);
+        }
+
         return 0;
     }
 
@@ -290,6 +360,7 @@ public class MEMarket {
         return 0;
     }
 
+
     private int appendBalanceTradeAdd(Order order, String asset, BigDecimal change, BigDecimal price, BigDecimal amt) {
 
         return 0;
@@ -299,9 +370,10 @@ public class MEMarket {
         return 0;
     }
 
-    private int appendBalanceFee(Order order, String asset, BigDecimal change, BigDecimal price, BigDecimal amt, BigDecimal feeRate) {
+    private int appendBalanceTradeFee(Order order, String asset, BigDecimal change, BigDecimal price, BigDecimal amt, BigDecimal feeRate) {
         return 0;
     }
+
 
     private int executeLimitAskOrder(boolean real, TradingMarket tm, Order taker) {
         BigDecimal price;
@@ -309,7 +381,6 @@ public class MEMarket {
         BigDecimal deal;
         BigDecimal askFee;
         BigDecimal bidFee;
-        BigDecimal result;
 
         Iterator<Order> iterator = tm.getBids().iterator();
         while (iterator.hasNext()) {
@@ -331,14 +402,14 @@ public class MEMarket {
 
             deal = price.multiply(amt);
             askFee = deal.multiply(taker.getTakerFee());
-            bidFee = deal.multiply(maker.getMakerFee());
+            bidFee = amt.multiply(maker.getMakerFee());
 
             Long timeNow = new Date().getTime();
             taker.setUpdateTime(timeNow);
             maker.setUpdateTime(timeNow);
             Long dealId = ++dealIdStart;
             if (real) {
-                meHistory.appendOrderDealHistory(timeNow, dealId, taker, MarketRoleEnum.TAKER, maker, MarketRoleEnum.MAKER, price, amt, deal, askFee, bidFee);
+                meHistory.AppendOrderDealHistory(timeNow, dealId, taker, MarketRoleEnum.TAKER, maker, MarketRoleEnum.MAKER, price, amt, deal, askFee, bidFee);
                 meMessage.PushDealMsg(timeNow, tm.getName(), taker, maker, price, amt, askFee, bidFee, OrderSideEnum.ASK, dealId, tm.getStock(), tm.getMoney());
             }
 
@@ -347,28 +418,53 @@ public class MEMarket {
             taker.setDealMoney(taker.getDealMoney().add(deal));
             taker.setDealFee(taker.getDealFee().add(askFee));
 
-            meBalance.BalanceSub(new BalanceKey(taker.getAccountId(), BalanceTypeEnum.AVAILABLE, tm.getStock()), amt);
-            if(real){
+            BalanceKey takerStockBKey = new BalanceKey(taker.getAccountId(), BalanceTypeEnum.AVAILABLE, tm.getStock());
+            BalanceKey takerMoneyBKey = new BalanceKey(taker.getAccountId(), BalanceTypeEnum.AVAILABLE, tm.getMoney());
+            meBalance.BalanceSub(takerStockBKey, amt);
+            if (real) {
                 appendBalanceTradeSub(taker, tm.getStock(), amt, price, amt);
             }
-            meBalance.BalanceAdd(new BalanceKey(taker.getAccountId(), BalanceTypeEnum.AVAILABLE, tm.getMoney()), deal);
-            if(real){
+            meBalance.BalanceAdd(takerMoneyBKey, deal);
+            if (real) {
                 appendBalanceTradeAdd(taker, tm.getMoney(), deal, price, amt);
             }
-            if(askFee.compareTo(BigDecimal.ZERO) > 0){
-                meBalance.BalanceSub(new BalanceKey(taker.getAccountId(), BalanceTypeEnum.AVAILABLE, tm.getMoney()), askFee);
-                if(real){
-                    appendBalanceFee(taker, tm.getMoney(), askFee, price, amt, maker.getMakerFee());
+            if (askFee.compareTo(BigDecimal.ZERO) > 0) {
+                meBalance.BalanceSub(takerMoneyBKey, askFee);
+                if (real) {
+                    appendBalanceTradeFee(taker, tm.getMoney(), askFee, price, amt, taker.getTakerFee());
                 }
             }
 
-            if(maker.getLeft().compareTo(BigDecimal.ZERO) == 0){
-                if(real){
+            maker.setLeft(maker.getLeft().subtract(amt));
+            maker.setFreeze(maker.getFreeze().subtract(deal));
+            maker.setDealStock(maker.getDealStock().add(amt));
+            maker.setDealMoney(maker.getDealMoney().add(deal));
+            maker.setDealFee(maker.getDealFee().add(bidFee));
+
+            BalanceKey makerStockBKey = new BalanceKey(maker.getAccountId(), BalanceTypeEnum.AVAILABLE, tm.getStock());
+            BalanceKey makerFreezeMoneyBKey = new BalanceKey(maker.getAccountId(), BalanceTypeEnum.FREEZE, tm.getMoney());
+            meBalance.BalanceSub(makerFreezeMoneyBKey, deal);
+            if (real) {
+                appendBalanceTradeSub(maker, tm.getMoney(), deal, price, amt);
+            }
+            meBalance.BalanceAdd(makerStockBKey, amt);
+            if (real) {
+                appendBalanceTradeAdd(maker, tm.getStock(), amt, price, amt);
+            }
+            if (bidFee.compareTo(BigDecimal.ZERO) > 0) {
+                meBalance.BalanceSub(makerStockBKey, bidFee);
+                if (real) {
+                    appendBalanceTradeFee(maker, tm.getStock(), bidFee, price, amt, maker.getMakerFee());
+                }
+            }
+
+            if (maker.getLeft().compareTo(BigDecimal.ZERO) == 0) {
+                if (real) {
                     meMessage.PushOrderMsg(OrderEventEnum.FINISH, maker, tm);
                 }
                 orderFinish(real, tm, maker);
-            }else{
-                if(real){
+            } else {
+                if (real) {
                     meMessage.PushOrderMsg(OrderEventEnum.UPDATE, maker, tm);
                 }
             }
@@ -378,14 +474,290 @@ public class MEMarket {
     }
 
     private int executeLimitBidOrder(boolean real, TradingMarket tm, Order taker) {
+        BigDecimal price;
+        BigDecimal amt;
+        BigDecimal deal;
+        BigDecimal askFee;
+        BigDecimal bidFee;
+
+        Iterator<Order> iterator = tm.getAsks().iterator();
+        while (iterator.hasNext()) {
+            if (taker.getLeft().compareTo(BigDecimal.ZERO) == 0) {
+                break;
+            }
+
+            Order maker = iterator.next();
+            if (taker.getPrice().compareTo(maker.getPrice()) < 0) {
+                break;
+            }
+
+            price = taker.getPrice();
+            if (taker.getLeft().compareTo(maker.getLeft()) < 0) {
+                amt = taker.getAmount();
+            } else {
+                amt = maker.getAmount();
+            }
+
+            deal = price.multiply(amt);
+            askFee = deal.multiply(maker.getMakerFee());
+            bidFee = amt.multiply(taker.getTakerFee());
+
+            Long timeNow = new Date().getTime();
+            taker.setUpdateTime(timeNow);
+            maker.setUpdateTime(timeNow);
+
+            long dealId = ++dealIdStart;
+            if (real) {
+                meHistory.AppendOrderDealHistory(timeNow, dealId, maker, MarketRoleEnum.MAKER, taker, MarketRoleEnum.TAKER, price, amt, deal, askFee, bidFee);
+                meMessage.PushDealMsg(timeNow, tm.getName(), maker, taker, price, amt, askFee, bidFee, OrderSideEnum.BID, dealId, tm.getStock(), tm.getMoney());
+            }
+
+            taker.setLeft(taker.getLeft().subtract(amt));
+            taker.setDealStock(taker.getDealStock().add(amt));
+            taker.setDealMoney(taker.getDealMoney().add(deal));
+            taker.setDealFee(taker.getDealFee().add(askFee));
+
+            BalanceKey takerStockBKey = new BalanceKey(taker.getAccountId(), BalanceTypeEnum.AVAILABLE, tm.getStock());
+            BalanceKey takerMoneyBKey = new BalanceKey(taker.getAccountId(), BalanceTypeEnum.AVAILABLE, tm.getMoney());
+            meBalance.BalanceSub(takerMoneyBKey, deal);
+            if (real) {
+                appendBalanceTradeSub(taker, tm.getMoney(), deal, price, amt);
+            }
+            meBalance.BalanceAdd(takerStockBKey, amt);
+            if (real) {
+                appendBalanceTradeAdd(taker, tm.getStock(), amt, price, amt);
+            }
+            if (bidFee.compareTo(BigDecimal.ZERO) > 0) {
+                meBalance.BalanceSub(takerStockBKey, bidFee);
+                if (real) {
+                    appendBalanceTradeFee(taker, tm.getStock(), bidFee, price, amt, taker.getTakerFee());
+                }
+            }
+
+            maker.setLeft(maker.getLeft().subtract(amt));
+            maker.setFreeze(maker.getFreeze().subtract(amt));
+            maker.setDealStock(maker.getDealStock().add(amt));
+            maker.setDealMoney(maker.getDealMoney().add(deal));
+            maker.setDealFee(maker.getDealFee().add(askFee));
+
+            BalanceKey makerFreezeStockBKey = new BalanceKey(maker.getAccountId(), BalanceTypeEnum.AVAILABLE, tm.getStock());
+            BalanceKey makerMoneyBKey = new BalanceKey(maker.getAccountId(), BalanceTypeEnum.FREEZE, tm.getMoney());
+            meBalance.BalanceSub(makerFreezeStockBKey, amt);
+            if (real) {
+                appendBalanceTradeSub(maker, tm.getStock(), amt, price, amt);
+            }
+            meBalance.BalanceAdd(makerMoneyBKey, deal);
+            if (real) {
+                appendBalanceTradeAdd(maker, tm.getMoney(), deal, price, amt);
+            }
+            if (askFee.compareTo(BigDecimal.ZERO) > 0) {
+                meBalance.BalanceSub(makerMoneyBKey, askFee);
+                if (real) {
+                    appendBalanceTradeFee(maker, tm.getMoney(), askFee, price, amt, maker.getMakerFee());
+                }
+            }
+
+            if (maker.getLeft().compareTo(BigDecimal.ZERO) == 0) {
+                if (real) {
+                    meMessage.PushOrderMsg(OrderEventEnum.FINISH, maker, tm);
+                }
+                orderFinish(real, tm, maker);
+            } else {
+                if (real) {
+                    meMessage.PushOrderMsg(OrderEventEnum.UPDATE, maker, tm);
+                }
+            }
+        }
+
         return 0;
     }
 
     private int executeMarketAskOrder(boolean real, TradingMarket tm, Order taker) {
+        BigDecimal price;
+        BigDecimal amt;
+        BigDecimal deal;
+        BigDecimal askFee;
+        BigDecimal bidFee;
+
+        Iterator<Order> iterator = tm.getBids().iterator();
+        while (iterator.hasNext()) {
+            if (taker.getLeft().compareTo(BigDecimal.ZERO) == 0) {
+                break;
+            }
+
+            Order maker = iterator.next();
+            price = maker.getPrice();
+            if (taker.getLeft().compareTo(maker.getLeft()) < 0) {
+                amt = taker.getLeft();
+            } else {
+                amt = maker.getLeft();
+            }
+
+            deal = price.multiply(amt);
+            askFee = deal.multiply(taker.getTakerFee());
+            bidFee = amt.multiply(maker.getMakerFee());
+
+            Long timeNow = new Date().getTime();
+            taker.setUpdateTime(timeNow);
+            maker.setUpdateTime(timeNow);
+            Long dealId = ++dealIdStart;
+            if (real) {
+                meHistory.AppendOrderDealHistory(timeNow, dealId, taker, MarketRoleEnum.TAKER, maker, MarketRoleEnum.MAKER, price, amt, deal, askFee, bidFee);
+                meMessage.PushDealMsg(timeNow, tm.getName(), taker, maker, price, amt, askFee, bidFee, OrderSideEnum.ASK, dealId, tm.getStock(), tm.getMoney());
+            }
+
+            taker.setLeft(taker.getLeft().subtract(amt));
+            taker.setDealStock(taker.getDealStock().add(amt));
+            taker.setDealMoney(taker.getDealMoney().add(deal));
+            taker.setDealFee(taker.getDealFee().add(askFee));
+
+            BalanceKey takerStockBKey = new BalanceKey(taker.getAccountId(), BalanceTypeEnum.AVAILABLE, tm.getStock());
+            BalanceKey takerMoneyBKey = new BalanceKey(taker.getAccountId(), BalanceTypeEnum.AVAILABLE, tm.getMoney());
+            meBalance.BalanceSub(takerStockBKey, amt);
+            if (real) {
+                appendBalanceTradeSub(taker, tm.getStock(), amt, price, amt);
+            }
+            meBalance.BalanceAdd(takerMoneyBKey, deal);
+            if (real) {
+                appendBalanceTradeAdd(taker, tm.getMoney(), deal, price, amt);
+            }
+            if (askFee.compareTo(BigDecimal.ZERO) > 0) {
+                meBalance.BalanceSub(takerMoneyBKey, askFee);
+                if (real) {
+                    appendBalanceTradeFee(taker, tm.getMoney(), askFee, price, amt, taker.getTakerFee());
+                }
+            }
+
+            maker.setLeft(maker.getLeft().subtract(amt));
+            maker.setFreeze(maker.getFreeze().subtract(deal));
+            maker.setDealStock(maker.getDealStock().add(amt));
+            maker.setDealMoney(maker.getDealMoney().add(deal));
+            maker.setDealFee(maker.getDealFee().add(bidFee));
+
+            BalanceKey makerStockBKey = new BalanceKey(maker.getAccountId(), BalanceTypeEnum.AVAILABLE, tm.getStock());
+            BalanceKey makerFreezeMoneyBKey = new BalanceKey(maker.getAccountId(), BalanceTypeEnum.FREEZE, tm.getMoney());
+            meBalance.BalanceSub(makerFreezeMoneyBKey, deal);
+            if (real) {
+                appendBalanceTradeSub(maker, tm.getMoney(), deal, price, amt);
+            }
+            meBalance.BalanceAdd(makerStockBKey, amt);
+            if (real) {
+                appendBalanceTradeAdd(maker, tm.getStock(), amt, price, amt);
+            }
+            if (bidFee.compareTo(BigDecimal.ZERO) > 0) {
+                meBalance.BalanceSub(makerStockBKey, bidFee);
+                if (real) {
+                    appendBalanceTradeFee(maker, tm.getStock(), bidFee, price, amt, maker.getMakerFee());
+                }
+            }
+
+            if (maker.getLeft().compareTo(BigDecimal.ZERO) == 0) {
+                if (real) {
+                    meMessage.PushOrderMsg(OrderEventEnum.FINISH, maker, tm);
+                }
+                orderFinish(real, tm, maker);
+            } else {
+                if (real) {
+                    meMessage.PushOrderMsg(OrderEventEnum.UPDATE, maker, tm);
+                }
+            }
+        }
+
         return 0;
     }
 
     private int executeMarketBidOrder(boolean real, TradingMarket tm, Order taker) {
+        BigDecimal price;
+        BigDecimal amt;
+        BigDecimal deal;
+        BigDecimal askFee;
+        BigDecimal bidFee;
+
+        Iterator<Order> iterator = tm.getAsks().iterator();
+        while (iterator.hasNext()) {
+            if (taker.getLeft().compareTo(BigDecimal.ZERO) == 0) {
+                break;
+            }
+
+            Order maker = iterator.next();
+            price = maker.getPrice();
+            if (taker.getLeft().compareTo(maker.getLeft()) < 0) {
+                amt = taker.getAmount();
+            } else {
+                amt = maker.getAmount();
+            }
+
+            deal = price.multiply(amt);
+            askFee = deal.multiply(maker.getMakerFee());
+            bidFee = amt.multiply(taker.getTakerFee());
+
+            Long timeNow = new Date().getTime();
+            taker.setUpdateTime(timeNow);
+            maker.setUpdateTime(timeNow);
+
+            long dealId = ++dealIdStart;
+            if (real) {
+                meHistory.AppendOrderDealHistory(timeNow, dealId, maker, MarketRoleEnum.MAKER, taker, MarketRoleEnum.TAKER, price, amt, deal, askFee, bidFee);
+                meMessage.PushDealMsg(timeNow, tm.getName(), maker, taker, price, amt, askFee, bidFee, OrderSideEnum.BID, dealId, tm.getStock(), tm.getMoney());
+            }
+
+            taker.setLeft(taker.getLeft().subtract(amt));
+            taker.setDealStock(taker.getDealStock().add(amt));
+            taker.setDealMoney(taker.getDealMoney().add(deal));
+            taker.setDealFee(taker.getDealFee().add(askFee));
+
+            BalanceKey takerStockBKey = new BalanceKey(taker.getAccountId(), BalanceTypeEnum.AVAILABLE, tm.getStock());
+            BalanceKey takerMoneyBKey = new BalanceKey(taker.getAccountId(), BalanceTypeEnum.AVAILABLE, tm.getMoney());
+            meBalance.BalanceSub(takerMoneyBKey, deal);
+            if (real) {
+                appendBalanceTradeSub(taker, tm.getMoney(), deal, price, amt);
+            }
+            meBalance.BalanceAdd(takerStockBKey, amt);
+            if (real) {
+                appendBalanceTradeAdd(taker, tm.getStock(), amt, price, amt);
+            }
+            if (bidFee.compareTo(BigDecimal.ZERO) > 0) {
+                meBalance.BalanceSub(takerStockBKey, bidFee);
+                if (real) {
+                    appendBalanceTradeFee(taker, tm.getStock(), bidFee, price, amt, taker.getTakerFee());
+                }
+            }
+
+            maker.setLeft(maker.getLeft().subtract(amt));
+            maker.setFreeze(maker.getFreeze().subtract(amt));
+            maker.setDealStock(maker.getDealStock().add(amt));
+            maker.setDealMoney(maker.getDealMoney().add(deal));
+            maker.setDealFee(maker.getDealFee().add(askFee));
+
+            BalanceKey makerFreezeStockBKey = new BalanceKey(maker.getAccountId(), BalanceTypeEnum.AVAILABLE, tm.getStock());
+            BalanceKey makerMoneyBKey = new BalanceKey(maker.getAccountId(), BalanceTypeEnum.FREEZE, tm.getMoney());
+            meBalance.BalanceSub(makerFreezeStockBKey, amt);
+            if (real) {
+                appendBalanceTradeSub(maker, tm.getStock(), amt, price, amt);
+            }
+            meBalance.BalanceAdd(makerMoneyBKey, deal);
+            if (real) {
+                appendBalanceTradeAdd(maker, tm.getMoney(), deal, price, amt);
+            }
+            if (askFee.compareTo(BigDecimal.ZERO) > 0) {
+                meBalance.BalanceSub(makerMoneyBKey, askFee);
+                if (real) {
+                    appendBalanceTradeFee(maker, tm.getMoney(), askFee, price, amt, maker.getMakerFee());
+                }
+            }
+
+            if (maker.getLeft().compareTo(BigDecimal.ZERO) == 0) {
+                if (real) {
+                    meMessage.PushOrderMsg(OrderEventEnum.FINISH, maker, tm);
+                }
+                orderFinish(real, tm, maker);
+            } else {
+                if (real) {
+                    meMessage.PushOrderMsg(OrderEventEnum.UPDATE, maker, tm);
+                }
+            }
+        }
+
         return 0;
     }
 }

@@ -18,19 +18,19 @@ public class MEHistory {
 
     }
 
-    public int appendOrderHistory(Order order){
+    public int AppendOrderHistory(Order order){
         return 0;
     }
 
-    public int appendOrderDealHistory(Long t, Long dealId, Order ask, MarketRoleEnum askRole, Order bid, MarketRoleEnum bidRole, BigDecimal price, BigDecimal amt, BigDecimal deal, BigDecimal askFee, BigDecimal bidFee){
+    public int AppendOrderDealHistory(Long t, Long dealId, Order ask, MarketRoleEnum askRole, Order bid, MarketRoleEnum bidRole, BigDecimal price, BigDecimal amt, BigDecimal deal, BigDecimal askFee, BigDecimal bidFee){
         return 0;
     }
 
-    public int appendAccountBalanceHistory(Long t, Long accountId, String asset, String business, BigDecimal change, String detail){
+    public int AppendAccountBalanceHistory(Long t, Long accountId, String asset, String business, BigDecimal change, String detail){
         return 0;
     }
 
-    public boolean isHistoryBlock(){
+    public boolean IsHistoryBlock(){
         return true;
     }
 
