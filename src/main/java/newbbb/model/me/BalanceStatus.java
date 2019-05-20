@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 
 public class BalanceStatus {
     public BigDecimal total = BigDecimal.ZERO;
-    public Long availableCount = 0L;
+    public Integer availableCount = 0;
     public BigDecimal available = BigDecimal.ZERO;
-    public Long freezeCount = 0L;
+    public Integer freezeCount = 0;
     public BigDecimal freeze = BigDecimal.ZERO;
 }

@@ -204,15 +204,16 @@ public class MEBalance {
         return balance;
     }
 
-    public BalanceStatus BalanceCurrentStatus() {
+    public BalanceStatus BalanceCurrentStatus(String asset) {
         BalanceStatus bs = new BalanceStatus();
         Set<Map.Entry<BalanceKey, BigDecimal>> entrySet = balances.entrySet();
         for (Map.Entry<BalanceKey, BigDecimal> entry : entrySet) {
             BalanceKey key = entry.getKey();
             BigDecimal val = entry.getValue();
-            if (!key.getAsset().equals(assets)) {
+            if (!key.getAsset().equals(asset)) {
                 continue;
             }
+            bs.total = bs.total.add(val);
             if (key.getType() == BalanceTypeEnum.AVAILABLE) {
                 bs.availableCount++;
                 bs.available.add(val);

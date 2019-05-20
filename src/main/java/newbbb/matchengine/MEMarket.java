@@ -1,12 +1,10 @@
 package newbbb.matchengine;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import newbbb.matchengine.enums.*;
-import newbbb.model.me.BalanceKey;
-import newbbb.model.me.Market;
-import newbbb.model.me.Order;
-import newbbb.model.me.TradingMarket;
+import newbbb.model.me.*;
 import newbbb.util.CodeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -100,8 +98,23 @@ public class MEMarket {
         return tm;
     }
 
-    public int GetStatus(TradingMarket tm, long askCount, BigDecimal askAmt, long bidCount, BigDecimal bidAmt) {
-        return 0;
+    public MarketStatus GetStatus(TradingMarket tm) {
+        MarketStatus ms = new MarketStatus();
+        ms.askCount = tm.getAsks().size();
+        ms.bidCount = tm.getBids().size();
+
+        Iterator<Order> iterator = tm.getAsks().iterator();
+        while (iterator.hasNext()){
+            Order order = iterator.next();
+            ms.askAmt = ms.askAmt.add(order.getAmount());
+        }
+
+        iterator = tm.getBids().iterator();
+        while (iterator.hasNext()){
+            Order order = iterator.next();
+            ms.bidAmt = ms.bidAmt.add(order.getAmount());
+        }
+        return ms;
     }
 
     public int PutLimitOrder(boolean real, JSONObject result, TradingMarket tm, long accountId,
@@ -192,18 +205,18 @@ public class MEMarket {
             }
         } else {
             BigDecimal balance = meBalance.BalanceGet(new BalanceKey(accountId, BalanceTypeEnum.AVAILABLE, tm.getMoney()));
-            if(balance == null || balance.compareTo(amt) < 0){
+            if (balance == null || balance.compareTo(amt) < 0) {
                 return -1;
             }
 
             Iterator<Order> iterator = tm.getAsks().iterator();
-            if(!iterator.hasNext()){
+            if (!iterator.hasNext()) {
                 return -3;
             }
 
             Order order = iterator.next();
             BigDecimal require = order.getPrice().multiply(tm.getMinAmount());
-            if(amt.compareTo(require) < 0){
+            if (amt.compareTo(require) < 0) {
                 return -2;
             }
         }
@@ -228,19 +241,19 @@ public class MEMarket {
         order.setDealFee(BigDecimal.ZERO);
 
         int ret;
-        if(side == OrderSideEnum.ASK){
+        if (side == OrderSideEnum.ASK) {
             ret = executeMarketAskOrder(real, tm, order);
-        }else{
+        } else {
             ret = executeMarketBidOrder(real, tm, order);
         }
-        if(ret < 0){
+        if (ret < 0) {
             log.error("execute order: {} fail: {}", order.getId(), ret);
-            return CodeUtil.LineNo();
+            return CodeUtil.ErrLineNo();
         }
 
-        if(real){
+        if (real) {
             ret = meHistory.AppendOrderHistory(order);
-            if(ret < 0){
+            if (ret < 0) {
                 log.error("append_order_history fail: {}, order: {}", ret, order.getId());
             }
             meMessage.PushOrderMsg(OrderEventEnum.FINISH, order, tm);
@@ -250,33 +263,41 @@ public class MEMarket {
         return 0;
     }
 
-    public int CancelOrder() {
+    public int CancelOrder(boolean real, JSONObject result, TradingMarket tm, Order order) {
+        if (real) {
+            meMessage.PushOrderMsg(OrderEventEnum.FINISH, order, tm);
+            result = GetOrderInfo(order);
+        }
+        orderFinish(real, tm, order);
         return 0;
     }
 
-    public int PutOrder() {
-        return 0;
+    public int PutOrder(TradingMarket tm, Order order) {
+        return orderPut(tm, order);
     }
 
     public JSONObject GetOrderInfo(Order order) {
-        return null;
+        return (JSONObject) JSONObject.toJSON(order);
     }
 
-    public Order GetOrder() {
-        return null;
+    public Order GetOrder(TradingMarket tm, long orderId) {
+        return tm.getOrders().get(orderId);
     }
 
-    public ConcurrentSkipListSet<Order> GetOrderList() {
-        return null;
+    public ConcurrentSkipListSet<Order> GetOrderList(TradingMarket tm, long accountId) {
+        return tm.getAccounts().get(accountId);
     }
 
-    public void MarketStatus() {
-
+    public String MarketStatus() {
+        String reply = "";
+        reply += "order last ID: " + orderIdStart + "\n";
+        reply += "deal last ID: " + dealIdStart + "\n";
+        return reply;
     }
 
 
     private int orderPut(TradingMarket tm, Order order) {
-        if (order.getType() == OrderTypeEnum.LIMIT) {
+        if (order.getType() != OrderTypeEnum.LIMIT) {
             return CodeUtil.ErrLineNo();
         }
 
@@ -362,16 +383,36 @@ public class MEMarket {
 
 
     private int appendBalanceTradeAdd(Order order, String asset, BigDecimal change, BigDecimal price, BigDecimal amt) {
-
-        return 0;
+        JSONObject detail = new JSONObject();
+        detail.put("m", order.getMarket());
+        detail.put("i", order.getId());
+        detail.put("p", price);
+        detail.put("a", amt);
+        String detailStr = detail.toJSONString();
+        return meHistory.AppendAccountBalanceHistory(new Date().getTime(), order.getAccountId(), asset, "trade", change, detailStr);
     }
 
     private int appendBalanceTradeSub(Order order, String asset, BigDecimal change, BigDecimal price, BigDecimal amt) {
-        return 0;
+        JSONObject detail = new JSONObject();
+        detail.put("m", order.getMarket());
+        detail.put("i", order.getId());
+        detail.put("p", price);
+        detail.put("a", amt);
+        String detailStr = detail.toJSONString();
+        BigDecimal realChange = change.negate();
+        return meHistory.AppendAccountBalanceHistory(new Date().getTime(), order.getAccountId(), asset, "trade", realChange, detailStr);
     }
 
     private int appendBalanceTradeFee(Order order, String asset, BigDecimal change, BigDecimal price, BigDecimal amt, BigDecimal feeRate) {
-        return 0;
+        JSONObject detail = new JSONObject();
+        detail.put("m", order.getMarket());
+        detail.put("i", order.getId());
+        detail.put("p", price);
+        detail.put("a", amt);
+        detail.put("f", feeRate);
+        BigDecimal realChange = change.negate();
+        String detailStr = detail.toJSONString();
+        return meHistory.AppendAccountBalanceHistory(new Date().getTime(), order.getAccountId(), asset, "trade", realChange, detailStr);
     }
 
 

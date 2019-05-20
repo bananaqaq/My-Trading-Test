@@ -27,7 +27,7 @@ public class Order{
     private BigDecimal takerFee;
     private BigDecimal makerFee;
     private BigDecimal left;
-    private BigDecimal freeze;
+    private transient BigDecimal freeze;
     private BigDecimal dealStock;
     private BigDecimal dealMoney;
     private BigDecimal dealFee;
