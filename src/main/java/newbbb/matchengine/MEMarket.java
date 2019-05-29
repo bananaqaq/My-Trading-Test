@@ -1,6 +1,5 @@
 package newbbb.matchengine;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import newbbb.matchengine.enums.*;
@@ -32,6 +31,7 @@ public class MEMarket {
     @Autowired
     private MEMessage meMessage;
 
+
     Comparator<Order> orderMatchCompare = (Order o1, Order o2) -> {
         if (o1.getId() == o2.getId()) {
             return 0;
@@ -59,6 +59,7 @@ public class MEMarket {
         }
         return id1 > id2 ? -1 : 1;
     };
+
 
     public TradingMarket MarketCreate(Market conf) {
         TradingMarket tm = new TradingMarket();
