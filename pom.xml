@@ -10,7 +10,7 @@
 
     <properties>
         <netty.version>4.1.25.Final</netty.version>
-        <spring.version>4.3.13.RELEASE</spring.version>
+        <spring.version>5.3.18</spring.version>
         <redis.client.version>2.9.0</redis.client.version>
         <redis.spring.version>1.8.8.RELEASE</redis.spring.version>
         <mybatis.version>3.4.5</mybatis.version>
